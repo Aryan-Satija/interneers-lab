@@ -13,9 +13,9 @@ class Brand(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2),
-    quantity = models.IntegerField(default=0),
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE),
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.IntegerField(default=0)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     
     def __str__(self):
