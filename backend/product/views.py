@@ -1,59 +1,62 @@
 from django.shortcuts import render
-from .models import Product, Category, Brand
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
-from .serializers import ProductSerializer
+from rest_framework.decorators import api_view
+
+products = []
+categories = []
+brands = []
 
 @api_view(['GET'])
 def getProductList(request):
-    products = Product.objects.all()   
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+    return Response(products)
 
 @api_view(['POST'])
 def addProduct(request):
     category_id = request.data.get('category')
     brand_id = request.data.get('brand')
     
-    if not Category.objects.filter(id=category_id).exists():
-        return Response({"error": "Category does not exist"})
+    if category_id > len(categories):
+        return Response({"error": "Category does not exist"}, status=400)
 
-    if not Brand.objects.filter(id=brand_id).exists():
-        return Response({"error": "Brand does not exist"})
-    
-    serializer = ProductSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
-    return Response(serializer.errors)
+    if brand_id > len(brands):
+        return Response({"error": "Brand does not exist"}, status=400)
 
+    product = {
+        "id": len(products) + 1,
+        "name": request.data.get("name"),
+        "description": request.data.get("description", ""),
+        "price": request.data.get("price", 0),
+        "quantity": request.data.get("quantity", 0),
+        "brand": brand_id,
+        "category": category_id
+    }
+    products.append(product)
+    return Response(product, status=201)
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
 def addBrand(request):
     name = request.data.get('name')
-    if not name:
-        return Response({"error": "Brand name is required"})
-    
-    if Brand.objects.filter(name=name).exists():
-        return Response({"error": "Brand already exists"})
-    
-    brand = Brand.objects.create(name=name)
 
-    return Response({"message": "Brand created successfully", "id": brand.id, "name": brand.name})
+    if not name:
+        return Response({"error": "Brand name is required"}, status=400)
+
+    if any(brand['name'] == name for brand in brands):
+        return Response({"error": "Brand already exists"}, status=400)
+
+    brand = {"id": len(brands) + 1, "name": name}
+    brands.append(brand)
+    return Response({"message": "Brand created successfully", "brand": brand}, status=201)
 
 @api_view(['POST'])
-@permission_classes([IsAdminUser])
 def addCategory(request):
     name = request.data.get('name')
+
     if not name:
-        return Response({"error": "Category name is required"})
-    
-    if Category.objects.filter(name=name).exists():
-        return Response({"error": "Category already exists"})
-    
-    category = Category.objects.create(name=name)
+        return Response({"error": "Category name is required"}, status=400)
 
-    return Response({"message": "Category created successfully", "id": category.id, "name": category.name})
+    if any(category['name'] == name for category in categories):
+        return Response({"error": "Category already exists"}, status=400)
 
+    category = {"id": len(categories) + 1, "name": name}
+    categories.append(category)
+    return Response({"message": "Category created successfully", "category": category}, status=201)
