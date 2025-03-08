@@ -13,7 +13,21 @@ categoryIndex = 1
 
 @api_view(['GET'])
 def getProductList(request):
-    return Response(products)
+    page = int(request.GET.get('page', 1))
+    pageSize = int(request.GET.get('page_size', 10))
+    
+    productList = list(products.values())
+    
+    totalProducts = len(products)
+    
+    start = (page-1)*pageSize
+    end = start + pageSize
+    
+    return Response({
+        "page": page,
+        "pageSize": pageSize,
+        "products": productList[start:end], 
+    })
 
 @api_view(['POST'])
 def addProduct(request):
