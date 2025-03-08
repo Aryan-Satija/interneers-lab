@@ -14,7 +14,7 @@ This Inventory Management System is developed as part of Rippling's pre-internsh
 
 #### Clone the Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/Aryan-Satija/interneers-lab.git
 cd inventory-management-system
 ```
 #### For Backend
