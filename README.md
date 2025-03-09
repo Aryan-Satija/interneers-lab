@@ -40,7 +40,7 @@ npm start
 ### 1. Get Product List  
 **Endpoint:**  
 ```
-GET /getProductList/
+GET /api/v1/getProductList/
 ```
 **Query Parameters:**  
 - `page` (integer, optional, default: 1)  
@@ -69,7 +69,7 @@ GET /getProductList/
 ### 2. Get Product Details  
 **Endpoint:**  
 ```
-GET /getProduct/{productId}/
+GET /api/v1/getProduct/{productId}/
 ```
 **Path Parameter:**  
 - `productId` (integer, required): ID of the product  
@@ -91,7 +91,7 @@ GET /getProduct/{productId}/
 ### 3. Add a Product  
 **Endpoint:**  
 ```
-POST /addProduct/
+POST /api/v1/addProduct/
 ```
 **Request Body:**  
 ```json
@@ -121,7 +121,7 @@ POST /addProduct/
 ### 4. Update a Product  
 **Endpoint:**  
 ```
-POST /updateProduct/
+POST /api/v1/updateProduct/
 ```
 **Request Body:**  
 ```json
@@ -152,7 +152,7 @@ POST /updateProduct/
 ### 5. Delete a Product  
 **Endpoint:**  
 ```
-POST /deleteProduct/
+POST /api/v1/deleteProduct/
 ```
 **Request Body:**  
 ```json
@@ -172,7 +172,7 @@ POST /deleteProduct/
 ### 6. Add a Brand  
 **Endpoint:**  
 ```
-POST /addBrand/
+POST /api/v1/addBrand/
 ```
 **Request Body:**  
 ```json

@@ -8,29 +8,29 @@ brands = {}
 isCategory = {}
 isBrand = {}
 index = 1
-brandIndex = 1
-categoryIndex = 1
+brand_index = 1
+category_index = 1
 
 @api_view(['GET'])
-def getProductList(request):
+def get_product_list(request):
     page = int(request.GET.get('page', 1))
-    pageSize = int(request.GET.get('page_size', 10))
+    page_size = int(request.GET.get('page_size', 10))
     
-    productList = list(products.values())
+    product_list = list(products.values())
     
-    totalProducts = len(products)
+    total_products = len(products)
     
-    start = (page-1)*pageSize
-    end = start + pageSize
+    start = (page-1)*page_size
+    end = start + page_size
     
     return Response({
         "page": page,
-        "pageSize": pageSize,
-        "products": productList[start:end], 
+        "pageSize": page_size,
+        "products": product_list[start:end], 
     })
 
 @api_view(['POST'])
-def addProduct(request):
+def add_product(request):
     global index
     category_id = request.data.get('category')
     brand_id = request.data.get('brand')
@@ -57,7 +57,7 @@ def addProduct(request):
     return Response(product, status=201)
 
 @api_view(['POST'])
-def updateProduct(request):
+def update_product(request):
     category_id = request.data.get('category')
     brand_id = request.data.get('brand')
     product_id = request.data.get('product')
@@ -85,7 +85,7 @@ def updateProduct(request):
     return Response(product, status=201)
 
 @api_view(['POST'])
-def deleteProduct(request):
+def delete_product(request):
     product_id = request.data.get('product')
     
     if product_id not in products:
@@ -96,8 +96,8 @@ def deleteProduct(request):
     return Response({"success": True}, status=201)
 
 @api_view(['POST'])
-def addBrand(request):
-    global brandIndex
+def add_brand(request):
+    global brand_index
     name = request.data.get('name')
 
     if not name:
@@ -106,23 +106,23 @@ def addBrand(request):
     if name in isBrand:
         return Response({"error": "Brand already exists"}, status=400)
 
-    brand = {"id": brandIndex, "name": name}
-    brands[brandIndex] = brand
-    brandIndex += 1
+    brand = {"id": brand_index, "name": name}
+    brands[brand_index] = brand
+    brand_index += 1
     isBrand[name] = True
     return Response({"message": "Brand created successfully", "brand": brand}, status=201)
 
 @api_view(['GET'])
-def getProduct(request, productId):
-    if productId not in products:
+def get_product(request, product_id):
+    if product_id not in products:
         return Response({
             "error": "Product does not exist",
         }, 400)
-    return Response(products[productId])
+    return Response(products[product_id])
 
 @api_view(['POST'])
-def addCategory(request):
-    global categoryIndex
+def add_category(request):
+    global category_index
     name = request.data.get('name')
 
     if not name:
@@ -131,8 +131,8 @@ def addCategory(request):
     if name in isCategory:
         return Response({"error": "Category already exists"}, status=400)
 
-    category = {"id": categoryIndex, "name": name}
-    categories[categoryIndex] = category
-    categoryIndex += 1
+    category = {"id": category_index, "name": name}
+    categories[category_index] = category
+    category_index += 1
     isCategory[name] = True
     return Response({"message": "Category created successfully", "category": category}, status=201)
