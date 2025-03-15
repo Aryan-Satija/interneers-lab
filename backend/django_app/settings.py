@@ -123,3 +123,19 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+import os
+import urllib.parse
+
+from dotenv import load_dotenv
+from mongoengine import connect
+
+load_dotenv()
+
+MONGO_USER = os.getenv("MONGO_USER")
+MONGO_PASS = os.getenv("MONGO_PASS")
+
+encoded_user = urllib.parse.quote_plus(MONGO_USER)
+encoded_pass = urllib.parse.quote_plus(MONGO_PASS)
+
+connect("inventory", host=f"mongodb+srv://{encoded_user}:{encoded_pass}@cluster0.aco7tzm.mongodb.net/inventory")
