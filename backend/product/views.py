@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
-from .serializers import ProductsSerializer, CategorySerializer, BrandSerializer
-from .models import Products, Category, Brand
+from .services.product_service import ProductService
+from .services.brand_service import BrandService
+from .services.category_service import CategoryService
+
 
 @api_view(['GET', 'POST'])
 def product_list_create(request):
@@ -13,70 +15,61 @@ def product_list_create(request):
         except ValueError:
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
-        start = (page - 1) * page_size
-        end = start + page_size
-
-        products = Products.objects.all()[start:end]
-        serializer = ProductsSerializer(products, many=True)
-
+        products = ProductService.get_paginated_products(page, page_size)
+        
         return Response({
             'page': page,
             'page_size': page_size,
-            'products': serializer.data
+            'products': products
         }) 
 
     elif request.method == 'POST':
-        serializer = ProductsSerializer(data=request.data)
+        data, error = ProductService.create_product(request.data)
         
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
+        if error:
+            return Response(error, status=400)
         
-        return Response(serializer.errors, status=400)
+        return Response(data, status=201)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def product_detail(request, product_id):
-    try:
-        product = Products.objects.get(id=product_id)
-    except Products.DoesNotExist:
-        return Response({"error": "Product does not exist"}, status=404)
-    
     if request.method == 'GET':
-        serializer = ProductsSerializer(product)
-        return Response(serializer.data)
+        product = ProductService.get_product_by_id(product_id)
+        
+        if not product:
+            return Response({"error": "Product does not exist"}, status=404)
+        
+        return Response(product)
         
     elif request.method == 'PUT':
-        serializer = ProductsSerializer(product, data=request.data, partial=True)
+        data, error = ProductService.update_product(product_id, request.data)
         
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=200)
+        if error:
+            return Response(error, status=400)
         
-        return Response(serializer.errors, status=400)
+        return Response(data, status=201)
     
     elif request.method == 'DELETE':
-        product.delete()
+        ProductService.delete_product(product_id)
         return Response({"message": "Product Deleted Successfully"}, status=204)
 
 
 @api_view(['POST'])
 def add_brand(request):
-    serializer = BrandSerializer(data=request.data)
-
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Brand Created Successfully", "brand": serializer.data}, status=201)
+    data, error = BrandService.create_brand(request.data)
     
-    return Response(serializer.errors, status=400) 
+    if error:
+        return Response(error, status=400)
+    
+    return Response(data, status=201)
 
 
 @api_view(['POST'])
 def add_category(request):
-    serializer = CategorySerializer(data=request.data)
+    data, error = CategoryService.create_category(request.data)
     
-    if serializer.is_valid():
-        serializer.save()
-        return Response({"message": "Category Created Successfully", "category": serializer.data}, status=201)
+    if error:
+        return Response(error, status=400)
     
-    return Response(serializer.errors, status=400)
+    return Response(data, status=201)
