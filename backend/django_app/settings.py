@@ -135,8 +135,13 @@ load_dotenv()
 
 MONGO_USER = os.getenv("MONGO_USER")
 MONGO_PASS = os.getenv("MONGO_PASS")
+USE_LOCAL_DB = os.getenv("USE_LOCAL_DB", False) == "true"
 
-encoded_user = urllib.parse.quote_plus(MONGO_USER)
-encoded_pass = urllib.parse.quote_plus(MONGO_PASS)
-
-connect("inventory", host=f"mongodb+srv://{encoded_user}:{encoded_pass}@cluster0.aco7tzm.mongodb.net/inventory")
+if USE_LOCAL_DB:
+    print("connecting to local db")
+    connect("inventory", host="mongodb://root:example@localhost:27018/inventory?authSource=admin")
+else:   
+    print("connecting to cloud db")
+    encoded_user = urllib.parse.quote_plus(MONGO_USER)
+    encoded_pass = urllib.parse.quote_plus(MONGO_PASS)
+    connect("inventory", host=f"mongodb+srv://{encoded_user}:{encoded_pass}@cluster0.aco7tzm.mongodb.net/inventory")
