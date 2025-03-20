@@ -45,6 +45,7 @@ GET /api/v1/product/
 **Query Parameters:**  
 - `page` (integer, optional, default: 1)  
 - `page_size` (integer, optional, default: 10)  
+- `sort_by` (string, optional)
 
 **Response:**  
 ```json
@@ -72,7 +73,7 @@ GET /api/v1/product/
 GET /api/v1/product/{productId}/
 ```
 **Path Parameter:**  
-- `productId` (integer, required): ID of the product  
+- `productId` (required): ID of the product  
 
 **Response:**  
 ```json
@@ -81,8 +82,8 @@ GET /api/v1/product/{productId}/
     "description": "Gaming laptop",
     "price": 1200,
     "quantity": 5,
-    "brand": 1,
-    "category": 2
+    "brand": "hp",
+    "category": "electronics"
 }
 ```
 
@@ -100,8 +101,8 @@ POST /api/v1/product/
     "description": "Gaming laptop",
     "price": 1200,
     "quantity": 5,
-    "brand": 1,
-    "category": 2
+    "brand": "67d6b556e19a4570777919f6",
+    "category": "67d6b562e19a4570777919f8"
 }
 ```
 **Response:**  
@@ -111,8 +112,8 @@ POST /api/v1/product/
     "description": "Gaming laptop",
     "price": 1200,
     "quantity": 5,
-    "brand": 1,
-    "category": 2
+    "brand": "hp",
+    "category": "electronics"
 }
 ```
 
@@ -131,8 +132,8 @@ PUT /api/v1/product/{productId}/
     "description": "Updated description",
     "price": 1500,
     "quantity": 10,
-    "brand": 1,
-    "category": 2
+    "brand": "67d6b556e19a4570777919f6",
+    "category": "67d6b562e19a4570777919f8"
 }
 ```
 **Response:**  
@@ -142,8 +143,8 @@ PUT /api/v1/product/{productId}/
     "description": "Updated description",
     "price": 1500,
     "quantity": 10,
-    "brand": 1,
-    "category": 2
+    "brand": "hp",
+    "category": "electronics"
 }
 ```
 
@@ -157,7 +158,7 @@ DELETE /api/v1/product/{productId}/
 **Request Body:**  
 ```json
 {
-    "product": 1
+    "product": "67d6b562e19a4570777919f8"
 }
 ```
 **Response:**  
@@ -177,7 +178,8 @@ POST /api/v1/brand/
 **Request Body:**  
 ```json
 {
-    "name": "Dell"
+    "name": "Dell",
+    "description": "Leading manufacturer of laptops and computers."
 }
 ```
 **Response:**  
@@ -186,7 +188,8 @@ POST /api/v1/brand/
     "message": "Brand created successfully",
     "brand": {
         "id": 1,
-        "name": "Dell"
+        "name": "Dell",
+        "description": "Leading manufacturer of laptops and computers."
     }
 }
 ```
@@ -201,7 +204,8 @@ POST /api/v1/category/
 **Request Body:**  
 ```json
 {
-    "name": "Electronics"
+    "name": "Electronics",
+    "description": "Devices and gadgets."
 }
 ```
 **Response:**  
@@ -210,7 +214,8 @@ POST /api/v1/category/
     "message": "Category created successfully",
     "category": {
         "id": 1,
-        "name": "Electronics"
+        "name": "Electronics",
+        "description": "Devices and gadgets."
     }
 }
 ```
