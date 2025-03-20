@@ -12,10 +12,11 @@ def product_list_create(request):
         try:
             page_size = int(request.GET.get('page_size', 10))
             page = int(request.GET.get('page', 1))
+            sort_by = request.GET.get('sort_by', '-created_at')
         except ValueError:
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
-        products = ProductService.get_paginated_products(page, page_size)
+        products = ProductService.get_paginated_products(page, page_size, sort_by)
         
         return Response({
             'page': page,
