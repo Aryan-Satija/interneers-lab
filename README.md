@@ -196,7 +196,7 @@ POST /api/v1/brand/
 ### 7. Add a Category  
 **Endpoint:**  
 ```
-POST /category/
+POST /api/v1/category/
 ```
 **Request Body:**  
 ```json
