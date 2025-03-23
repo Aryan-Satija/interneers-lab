@@ -4,10 +4,10 @@ from ..serializers import ProductsSerializer
 class ProductService:
     
     @staticmethod
-    def get_paginated_products(page, page_size, sort_by = '-created_at'):
+    def get_paginated_products(page, page_size, name, min_price, max_price, brand, category, sort_by = '-created_at'):
         start = (page - 1) * page_size
         end = start + page_size
-        products = productRepository.get_all_products(start, end, sort_by)
+        products = productRepository.get_all_products(start, end, name, min_price, max_price, brand, category, sort_by)
         return ProductsSerializer(products, many = True).data
     
     @staticmethod

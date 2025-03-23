@@ -13,10 +13,15 @@ def product_list_create(request):
             page_size = int(request.GET.get('page_size', 10))
             page = int(request.GET.get('page', 1))
             sort_by = request.GET.get('sort_by', '-created_at')
+            name = request.GET.get('name', None)
+            min_price = request.GET.get('min_price', None)
+            max_price = request.GET.get('max_price', None)
+            brand = request.GET.get('brand', None)
+            category = request.GET.get('category', None)
         except ValueError:
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
-        products = ProductService.get_paginated_products(page, page_size, sort_by)
+        products = ProductService.get_paginated_products(page, page_size, name, min_price, max_price, brand, category, sort_by)
         
         return Response({
             'page': page,
