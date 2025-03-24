@@ -3,8 +3,7 @@ from mongoengine.queryset.visitor import Q
 
 class productRepository:
     
-    @staticmethod
-    def get_all_products(start, end, name, min_price, max_price, brand, category, sort_by = '-created_at'):
+    def get_all_products(self, start, end, name, min_price, max_price, brand, category, sort_by = '-created_at'):
         allowed_sorts = ['name', '-name', 'price', '-price', 'created_at', '-created_at', 'updated_at', '-updated_at']
         
         if sort_by not in allowed_sorts:
@@ -29,21 +28,17 @@ class productRepository:
             
         return Products.objects.filter(query).order_by(sort_by)[start:end]
     
-    @staticmethod
-    def get_product_by_id(product_id):
+    def get_product_by_id(self, product_id):
         return Products.objects.get(id = product_id)
     
-    @staticmethod
-    def create_product(product_data):
+    def create_product(self, product_data):
         return Products.objects.create(**product_data)
     
-    @staticmethod
-    def update_product(product, new_product):
+    def update_product(self, product, new_product):
         for item, val in new_product.items():
             setattr(product, item, val)
         product.save()
         return product
     
-    @staticmethod
-    def delete_product(product):
+    def delete_product(self, product):
         product.delete()

@@ -1,7 +1,7 @@
 from ..serializers import CategorySerializer
 
 class CategoryService:
-    @staticmethod
+    
     def create_category(data):
         serializer = CategorySerializer(data=data)
         

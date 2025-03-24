@@ -5,6 +5,9 @@ from .services.product_service import ProductService
 from .services.brand_service import BrandService
 from .services.category_service import CategoryService
 
+product_service = ProductService()
+brand_service = BrandService()
+category_service = CategoryService()
 
 @api_view(['GET', 'POST'])
 def product_list_create(request):
@@ -21,7 +24,7 @@ def product_list_create(request):
         except ValueError:
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
-        products = ProductService.get_paginated_products(page, page_size, name, min_price, max_price, brand, category, sort_by)
+        products = product_service.get_paginated_products(page, page_size, name, min_price, max_price, brand, category, sort_by)
         
         return Response({
             'page': page,
@@ -30,7 +33,7 @@ def product_list_create(request):
         }) 
 
     elif request.method == 'POST':
-        data, error = ProductService.create_product(request.data)
+        data, error = product_service.create_product(request.data)
         
         if error:
             return Response(error, status=400)
@@ -41,7 +44,7 @@ def product_list_create(request):
 @api_view(['GET', 'PUT', 'DELETE'])
 def product_detail(request, product_id):
     if request.method == 'GET':
-        product = ProductService.get_product_by_id(product_id)
+        product = product_service.get_product_by_id(product_id)
         
         if not product:
             return Response({"error": "Product does not exist"}, status=404)
@@ -49,7 +52,7 @@ def product_detail(request, product_id):
         return Response(product)
         
     elif request.method == 'PUT':
-        data, error = ProductService.update_product(product_id, request.data)
+        data, error = product_service.update_product(product_id, request.data)
         
         if error:
             return Response(error, status=400)
@@ -57,13 +60,13 @@ def product_detail(request, product_id):
         return Response(data, status=201)
     
     elif request.method == 'DELETE':
-        ProductService.delete_product(product_id)
+        product_service.delete_product(product_id)
         return Response({"message": "Product Deleted Successfully"}, status=204)
 
 
 @api_view(['POST'])
 def add_brand(request):
-    data, error = BrandService.create_brand(request.data)
+    data, error = brand_service.create_brand(request.data)
     
     if error:
         return Response(error, status=400)
@@ -73,7 +76,7 @@ def add_brand(request):
 
 @api_view(['POST'])
 def add_category(request):
-    data, error = CategoryService.create_category(request.data)
+    data, error = category_service.create_category(request.data)
     
     if error:
         return Response(error, status=400)

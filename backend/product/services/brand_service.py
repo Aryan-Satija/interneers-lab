@@ -1,7 +1,7 @@
 from ..serializers import BrandSerializer
 
 class BrandService:
-    @staticmethod
+    
     def create_brand(data):
         serializer = BrandSerializer(data=data)
         

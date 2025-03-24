@@ -3,24 +3,25 @@ from ..serializers import ProductsSerializer
 
 class ProductService:
     
-    @staticmethod
-    def get_paginated_products(page, page_size, name, min_price, max_price, brand, category, sort_by = '-created_at'):
+    def __init__(self):
+        self.product_repository = productRepository()
+        
+    def get_paginated_products(self, page, page_size, name, min_price, max_price, brand, category, sort_by = '-created_at'):
         start = (page - 1) * page_size
         end = start + page_size
-        products = productRepository.get_all_products(start, end, name, min_price, max_price, brand, category, sort_by)
+        print(self, page, page_size, name, min_price, max_price, brand, category, sort_by)
+        products = self.product_repository.get_all_products(start, end, name, min_price, max_price, brand, category, sort_by)
         return ProductsSerializer(products, many = True).data
     
-    @staticmethod
-    def get_product_by_id(product_id):
-        product = productRepository.get_product_by_id(product_id)
+    def get_product_by_id(self, product_id):
+        product = self.product_repository.get_product_by_id(product_id)
         
         if not product:
             return None
         
         return ProductsSerializer(product).data
     
-    @staticmethod
-    def create_product(data):
+    def create_product(self, data):
         serializer = ProductsSerializer(data=data)
         
         if serializer.is_valid():
@@ -29,9 +30,8 @@ class ProductService:
         
         return None, serializer.errors   
     
-    @staticmethod
-    def update_product(product_id, data):
-        product = productRepository.get_product_by_id(product_id)
+    def update_product(self, product_id, data):
+        product = self.product_repository.get_product_by_id(product_id)
         
         if not product:
             return None, {"error": "Product does not exist"}
@@ -44,12 +44,11 @@ class ProductService:
         
         return None, serializer.errors
 
-    @staticmethod
-    def delete_product(product_id):
-        product = productRepository.get_product_by_id(product_id)
+    def delete_product(self, product_id):
+        product = self.product_repository.get_product_by_id(product_id)
         
         if not product:
             return {"error": "Product does not exist"}
 
-        productRepository.delete_product(product)
+        self.product_repository.delete_product(product)
         return {"message": "Product Deleted Successfully"}
