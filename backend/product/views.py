@@ -1,13 +1,23 @@
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from dataclasses import dataclass
+from typing import Optional
 from .services.product_service import ProductService
 from .services.brand_service import BrandService
 from .services.category_service import CategoryService
-
 product_service = ProductService()
 brand_service = BrandService()
 category_service = CategoryService()
+
+
+@dataclass
+class GetProductRequest:
+    name: Optional[str] = None
+    min_price: Optional[str] = None
+    max_price: Optional[str] = None
+    brand: Optional[str] = None
+    category: Optional[str] = None
 
 @api_view(['GET', 'POST'])
 def product_list_create(request):
@@ -16,15 +26,17 @@ def product_list_create(request):
             page_size = int(request.GET.get('page_size', 10))
             page = int(request.GET.get('page', 1))
             sort_by = request.GET.get('sort_by', '-created_at')
-            name = request.GET.get('name', None)
-            min_price = request.GET.get('min_price', None)
-            max_price = request.GET.get('max_price', None)
-            brand = request.GET.get('brand', None)
-            category = request.GET.get('category', None)
+            get_product_request = GetProductRequest(                
+                name = request.GET.get('name', None),
+                min_price = request.GET.get('min_price', None),
+                max_price = request.GET.get('max_price', None),
+                brand = request.GET.get('brand', None),
+                category = request.GET.get('category', None)
+            )
         except ValueError:
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
-        products = product_service.get_paginated_products(page, page_size, name, min_price, max_price, brand, category, sort_by)
+        products = product_service.get_paginated_products(page, page_size, get_product_request, sort_by)
         
         return Response({
             'page': page,

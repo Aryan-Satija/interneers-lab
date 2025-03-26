@@ -3,7 +3,7 @@ from mongoengine.queryset.visitor import Q
 
 class productRepository:
     
-    def get_all_products(self, start, end, name, min_price, max_price, brand, category, sort_by = '-created_at'):
+    def get_all_products(self, start, end, get_product_request, sort_by = '-created_at'):
         allowed_sorts = ['name', '-name', 'price', '-price', 'created_at', '-created_at', 'updated_at', '-updated_at']
         
         if sort_by not in allowed_sorts:
@@ -11,18 +11,18 @@ class productRepository:
           
         query = Q()
           
-        if name:
-            query &= Q(name__icontains = name)
-        if min_price:
-            query &= Q(price__gte = min_price)
-        if max_price:
-            query &= Q(price__lte = max_price)
-        if brand:
-            brand_obj = Brand.objects.filter(name__icontains = brand).first()
+        if get_product_request.name:
+            query &= Q(name__icontains = get_product_request.name)
+        if get_product_request.min_price:
+            query &= Q(price__gte = get_product_request.min_price)
+        if get_product_request.max_price:
+            query &= Q(price__lte = get_product_request.max_price)
+        if get_product_request.brand:
+            brand_obj = Brand.objects.filter(name__icontains = get_product_request.brand).first()
             if brand_obj:
                 query &= Q(brand = brand_obj.id)
-        if category:
-            category_obj = Category.objects.filter(name__icontains = category).first()
+        if get_product_request.category:
+            category_obj = Category.objects.filter(name__icontains = get_product_request.category).first()
             if category_obj:
                 query &= Q(category = category_obj.id)
             

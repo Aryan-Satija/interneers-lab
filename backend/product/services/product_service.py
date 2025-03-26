@@ -6,11 +6,10 @@ class ProductService:
     def __init__(self):
         self.product_repository = productRepository()
         
-    def get_paginated_products(self, page, page_size, name, min_price, max_price, brand, category, sort_by = '-created_at'):
+    def get_paginated_products(self, page, page_size, get_product_request, sort_by = '-created_at'):
         start = (page - 1) * page_size
         end = start + page_size
-        print(self, page, page_size, name, min_price, max_price, brand, category, sort_by)
-        products = self.product_repository.get_all_products(start, end, name, min_price, max_price, brand, category, sort_by)
+        products = self.product_repository.get_all_products(start, end, get_product_request, sort_by)
         return ProductsSerializer(products, many = True).data
     
     def get_product_by_id(self, product_id):
