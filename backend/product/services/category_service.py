@@ -2,7 +2,7 @@ from ..serializers import CategorySerializer
 
 class CategoryService:
     
-    def create_category(data):
+    def create_category(self, data):
         serializer = CategorySerializer(data=data)
         
         if serializer.is_valid():

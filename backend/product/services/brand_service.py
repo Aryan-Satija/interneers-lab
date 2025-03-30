@@ -2,7 +2,7 @@ from ..serializers import BrandSerializer
 
 class BrandService:
     
-    def create_brand(data):
+    def create_brand(self, data):
         serializer = BrandSerializer(data=data)
         
         if serializer.is_valid():
