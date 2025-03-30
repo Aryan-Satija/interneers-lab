@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, List
 from .services.product_service import ProductService
 from .services.brand_service import BrandService
 from .services.category_service import CategoryService
@@ -16,8 +16,8 @@ class GetProductRequest:
     name: Optional[str] = None
     min_price: Optional[str] = None
     max_price: Optional[str] = None
-    brand: Optional[str] = None
-    category: Optional[str] = None
+    brand: Optional[List[str]] = None
+    category: Optional[List[str]] = None
 
 @api_view(['GET', 'POST'])
 def product_list_create(request):
@@ -30,8 +30,8 @@ def product_list_create(request):
                 name = request.GET.get('name', None),
                 min_price = request.GET.get('min_price', None),
                 max_price = request.GET.get('max_price', None),
-                brand = request.GET.get('brand', None),
-                category = request.GET.get('category', None)
+                brand = request.GET.get('brand', None).split(',') if request.GET.get('brand', None) else None,
+                category = request.GET.get('category', None).split(',') if request.GET.get('category', None) else None
             )
         except ValueError:
             return Response({"error": "Invalid page or page_size value"}, status=400)

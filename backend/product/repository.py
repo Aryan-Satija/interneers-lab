@@ -18,13 +18,13 @@ class productRepository:
         if get_product_request.max_price:
             query &= Q(price__lte = get_product_request.max_price)
         if get_product_request.brand:
-            brand_obj = Brand.objects.filter(name__icontains = get_product_request.brand).first()
-            if brand_obj:
-                query &= Q(brand = brand_obj.id)
+            brand_objs = Brand.objects.filter(name__in = get_product_request.brand)
+            brand_ids = [brd.id for brd in brand_objs] 
+            query &= Q(brand__in = brand_ids)
         if get_product_request.category:
-            category_obj = Category.objects.filter(name__icontains = get_product_request.category).first()
-            if category_obj:
-                query &= Q(category = category_obj.id)
+            category_objs = Category.objects.filter(name__in=get_product_request.category)
+            category_ids = [cat.id for cat in category_objs] 
+            query &= Q(category__in=category_ids)  
             
         return Products.objects.filter(query).order_by(sort_by)[start:end]
     
