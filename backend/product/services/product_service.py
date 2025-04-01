@@ -7,6 +7,9 @@ class ProductService:
         self.product_repository = productRepository()
         
     def get_paginated_products(self, page, page_size, get_product_request, sort_by = '-created_at'):
+        if page < 1 or page_size < 1:
+            return None, {"error": "Invalid pagination values"}
+        
         start = (page - 1) * page_size
         end = start + page_size
         products = self.product_repository.get_all_products(start, end, get_product_request, sort_by)
@@ -21,6 +24,18 @@ class ProductService:
         return ProductsSerializer(product).data
     
     def create_product(self, data):
+        required_fields = ["name", "description", "price", "quantity", "category", "brand"]
+        
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return None, {"error": f"Missing required fields: {', '.join(missing_fields)}"}
+        
+        if data.get("price") < 0:
+            return None, {"error": "Price cannot be negative"}
+        
+        if data.get("quantity") < 0:
+            return None, {"error": "Quantity cannot be negative"}
+        
         serializer = ProductsSerializer(data=data)
         
         if serializer.is_valid():
@@ -30,6 +45,18 @@ class ProductService:
         return None, serializer.errors   
     
     def update_product(self, product_id, data):
+        required_fields = ["name", "description", "price", "quantity", "category", "brand"]
+        
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return None, {"error": f"Missing required fields: {', '.join(missing_fields)}"}
+        
+        if data.get("price") < 0:
+            return None, {"error": "Price cannot be negative"}
+        
+        if data.get("quantity") < 0:
+            return None, {"error": "Quantity cannot be negative"}
+        
         product = self.product_repository.get_product_by_id(product_id)
         
         if not product:
