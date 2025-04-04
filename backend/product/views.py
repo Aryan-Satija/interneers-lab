@@ -57,11 +57,11 @@ def product_list_create(request):
 def product_detail(request, product_id):
     if request.method == 'GET':
         product = product_service.get_product_by_id(product_id)
-        
+         
         if not product:
             return Response({"error": "Product does not exist"}, status=404)
         
-        return Response(product)
+        return Response({"product": product}, status=200)
         
     elif request.method == 'PUT':
         data, error = product_service.update_product(product_id, request.data)
