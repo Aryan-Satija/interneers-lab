@@ -95,20 +95,20 @@ class ProductAPITestCase(APITestCase):
     
     def test_get_product_details_valid(self):
         url = reverse('product-list')
-        url = url + str(self.testproduct.id)
+        url = url + str(self.testproduct.id) + "/"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_get_product_details_invalid(self):
         invalid_id = "605c5c5d8f1b2c1e1e1e1e1e"
         url = reverse('product-list')
-        url = url + invalid_id
+        url = url + invalid_id + "/"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
         
     def test_put_product_valid(self):
         url = reverse('product-list')
-        url = url + str(self.testproduct.id)
+        url = url + str(self.testproduct.id) + "/"
         data = {"name": self.testproduct.name, "description": self.testproduct.description, "price": self.testproduct.price, "quantity": self.testproduct.quantity, "category": str(self.testcategory.id), "brand": str(self.testbrand.id)}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 201)
@@ -116,7 +116,7 @@ class ProductAPITestCase(APITestCase):
     def test_put_product_invalid(self):
         invalid_id = "605c5c5d8f1b2c1e1e1e1e1e"
         url = reverse('product-list')
-        url = url + invalid_id
+        url = url + invalid_id + "/"
         data = {"name": self.testproduct.name, "description": self.testproduct.description, "price": self.testproduct.price, "quantity": self.testproduct.quantity, "category": str(self.testcategory.id), "brand": str(self.testbrand.id)}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 400)
