@@ -2,6 +2,7 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 from mongoengine import connect, disconnect
 from product.models import Products, Brand, Category
+from product.seed_db import run_seed
 
 class ProductAPITestCase(APITestCase):
     
@@ -11,7 +12,7 @@ class ProductAPITestCase(APITestCase):
         
         connect("inventory", alias="inventory", host="mongodb://root:example@localhost:27018/inventory?authSource=admin")
         
-        # TODO: seed_db() 
+        run_seed()
         
         productTestCaseClass.testbrand = Brand(name="Test Brand", description="Test Description").save()
         productTestCaseClass.testcategory = Category(name="Test Ctegory", description="Test Description").save()
