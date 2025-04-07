@@ -29,7 +29,10 @@ class productRepository:
         return Products.objects.filter(query).order_by(sort_by)[start:end]
     
     def get_product_by_id(self, product_id):
-        return Products.objects.get(id = product_id)
+        try:
+            return Products.objects.get(id = product_id)
+        except:
+            return None
     
     def create_product(self, product_data):
         return Products.objects.create(**product_data)
