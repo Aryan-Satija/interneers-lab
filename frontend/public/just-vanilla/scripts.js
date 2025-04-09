@@ -1,10 +1,16 @@
 const container = document.getElementById("product-container")
 
 async function getProducts(){
+    const spinner = document.createElement("div");
+    spinner.className = "spinner"
+    container.appendChild(spinner)
+
     try{
         const response = await fetch("http://localhost:8000/api/v1/product")
         const data = await response.json();
         
+        spinner.remove()
+
         data.products.forEach((product) => {
             const tile = document.createElement("div");
             tile.className = "product-tile"
