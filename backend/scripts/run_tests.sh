@@ -3,8 +3,11 @@
 set -e 
 set -o pipefail 
 
+echo "creating virtual environment :-"
+python -m venv venv
+
 echo "Activating virtual environment :-"
-source venv/scripts/activate
+source venv/bin/activate
 
 echo "Installing backend dependencies :-"
 pip install -r requirements.txt
