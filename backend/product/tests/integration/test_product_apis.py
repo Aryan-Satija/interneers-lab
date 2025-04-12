@@ -64,7 +64,7 @@ class ProductAPITestCase(APITestCase):
     
     def test_create_product_valid(self):
         url = reverse('product-list')
-        response = self.client.post(url, { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": "67dc2fb0fead7871ab74c197" }, format="json")
+        response = self.client.post(url, { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) }, format="json")
         self.assertEqual(response.status_code, 201)
 
     def test_create_product_missing_product_details(self):
