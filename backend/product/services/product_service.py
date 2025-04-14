@@ -74,7 +74,7 @@ class ProductService:
         product = self.product_repository.get_product_by_id(product_id)
         
         if not product:
-            return {"error": "Product does not exist"}
+            return {"error": "Product does not exist"}, True
 
         self.product_repository.delete_product(product)
-        return {"message": "Product Deleted Successfully"}
+        return {"message": "Product Deleted Successfully"}, False

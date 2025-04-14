@@ -72,8 +72,8 @@ def product_detail(request, product_id):
         return Response(data, status=201)
     
     elif request.method == 'DELETE':
-        product_service.delete_product(product_id)
-        return Response({"message": "Product Deleted Successfully"}, status=204)
+        response, is_error = product_service.delete_product(product_id)
+        return Response(response, status=204) if not is_error else Response(response, 404)
 
 
 @api_view(['POST'])
