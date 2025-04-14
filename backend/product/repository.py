@@ -45,3 +45,30 @@ class productRepository:
     
     def delete_product(self, product):
         product.delete()
+
+class categoryRepository:
+    
+    def create_category(self, data):
+        return Category.objects.create(**data)
+    
+    def delete_category(self, category_id):
+        try:
+            category = Category.objects.get(id = category_id)
+            category.delete()
+            return True
+        except:
+            return False
+        
+class brandRepository:
+    
+    def create_brand(self, data):
+        return Brand.objects.create(**data)
+    
+    def delete_brand(self, brand_id):
+        try:
+            brand = Brand.objects.get(id = brand_id)
+            brand.delete()
+            return True
+        except:
+            return False
+        

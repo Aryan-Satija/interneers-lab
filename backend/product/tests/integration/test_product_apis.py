@@ -1,8 +1,12 @@
 from rest_framework.test import APITestCase
 from django.urls import reverse
 from mongoengine import connect, disconnect
-from product.models import Products, Brand, Category
 from product.seed_db import run_seed
+from product.repository import productRepository, categoryRepository, brandRepository
+
+product_repository = productRepository()
+category_repository = categoryRepository()
+brand_repository = brandRepository()
 
 class ProductAPITestCase(APITestCase):
     
@@ -14,17 +18,18 @@ class ProductAPITestCase(APITestCase):
         
         run_seed()
         
-        productTestCaseClass.testbrand = Brand(name="Test Brand", description="Test Description").save()
-        productTestCaseClass.testcategory = Category(name="Test Ctegory", description="Test Description").save()
-        productTestCaseClass.testproduct = Products(name="Test Product", description="Test Description", quantity=10, price=100000, brand=productTestCaseClass.testbrand, category=productTestCaseClass.testcategory).save()
+        productTestCaseClass.testbrand = brand_repository.create_brand({'name':"Test Brand", 'description':"Test Description"})
+        productTestCaseClass.testcategory = category_repository.create_category({'name': "Test Ctegory", 'description': "Test Description"})
+        productTestCaseClass.testproduct = product_repository.create_product({'name':"Test Product", 'description':"Test Description", 'quantity':10, 'price':100000, 'brand':productTestCaseClass.testbrand, 'category':productTestCaseClass.testcategory})
         
         
 
     @classmethod
     def tearDownClass(productTestCaseClass):
-        Brand.objects(name="Test Brand").delete()
-        Category.objects(name="Test Ctegory").delete()
-        Products.objects(name="Test Product").delete()   
+        
+        brand_repository.delete_brand(productTestCaseClass.testbrand.id)
+        category_repository.delete_category(productTestCaseClass.testcategory.id)
+        product_repository.delete_product(productTestCaseClass.testproduct)
         
         disconnect(alias="inventory")
         super().tearDownClass()
@@ -146,21 +151,23 @@ class ProductAPITestCase(APITestCase):
         self.assertEqual(response.status_code, 400)
     
     def test_delete_product_valid(self):
-        temp_product = Products(
-            name="Temporary Product",
-            description="Temporary Product Description",
-            quantity=10,
-            price=50000,
-            brand=str(self.testbrand.id),
-            category=str(self.testcategory.id)
-        ).save()
+        temp_product = product_repository.create_product(
+            {                
+                'name':"Temporary Product",
+                'description':"Temporary Product Description",
+                'quantity':10,
+                'price':50000,
+                'brand':str(self.testbrand.id),
+                'category':str(self.testcategory.id)
+            }
+        )
         
         url = reverse('product-list') + f"{temp_product.id}/"
         
         response = self.client.delete(url)
         
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(Products.objects.filter(id = temp_product.id).count(), 0)
+        self.assertEqual(product_repository.get_product_by_id(temp_product.id), None)
 
     def test_delete_product_invalid(self):
         invalid_id = "605c5c5d8f1b2c1e1e1e1e1e"
