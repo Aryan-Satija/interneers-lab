@@ -42,6 +42,12 @@ class ProductAPITestCase(APITestCase):
             response = self.client.get(url, {'page': 1, 'page_size': page_size})
             self.assertLessEqual(len(response.data['products']), page_size)
     
+    def test_pagination_beyond_available_pages(self):
+        url = reverse('product-list')
+        response = self.client.get(url, {'page': 9999, 'page_size': 5})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['products']), 0)
+    
     def test_get_product_list_filter_by_price(self):
         
         url, min_price, max_price = "/api/v1/product/", 50000, 70000
@@ -62,6 +68,21 @@ class ProductAPITestCase(APITestCase):
         
         self.assertTrue(all(name in nm for nm in names))
     
+    def test_get_product_list_combined_filters(self):
+        
+        url = reverse('product-list')
+        filters = {'name': self.testproduct.name, 'min_price': 10000, 'max_price': 50000, 'page': 1, 'page_size': 5}
+        response = self.client.get(url, filters)
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertLessEqual(len(response.data['products']), filters['page_size'])
+        
+        for product in response.data['products']:
+            self.assertEqual(product.name, filters['name'])
+            self.assertGreaterEqual(product.price, filters['min_price'])
+            self.assertLessEqual(product.price, filters['max_price'])
+        
+        
     def test_create_product_valid(self):
         url = reverse('product-list')
         response = self.client.post(url, { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) }, format="json")
@@ -71,11 +92,11 @@ class ProductAPITestCase(APITestCase):
         url = reverse('product-list')
         
         bad_products = [
-            { "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": "67dc2fb0fead7871ab74c197" },
-            { "name": "Apple MacBook Air", "price": 100000, "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": "67dc2fb0fead7871ab74c197" },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": "67dc2fb0fead7871ab74c197" },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "category": "67e8ef6bd739b2427101bddc", "brand": "67dc2fb0fead7871ab74c197" },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "brand": "67dc2fb0fead7871ab74c197" },
+            { "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
+            { "name": "Apple MacBook Air", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "brand": str(self.testbrand.id) },
         ]
         
         for bad_product in bad_products:
@@ -86,8 +107,10 @@ class ProductAPITestCase(APITestCase):
         url = reverse('product-list')
         
         bad_products = [
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": -100000, "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": "67dc2fb0fead7871ab74c197" }, # negative price
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": -5, "category": "67e8ef6bd739b2427101bddc", "brand": "67dc2fb0fead7871ab74c197" }, # negative quantity
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": -100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) }, # negative price
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": -5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) }, # negative quantity
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": str(self.testbrand.id) }, # non-existent category
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": "67dc2fb0fead7871ab74c197" }, # non-existent brand
         ]
         
         for bad_product in bad_products:
@@ -121,3 +144,28 @@ class ProductAPITestCase(APITestCase):
         data = {"name": self.testproduct.name, "description": self.testproduct.description, "price": self.testproduct.price, "quantity": self.testproduct.quantity, "category": str(self.testcategory.id), "brand": str(self.testbrand.id)}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 400)
+    
+    def test_delete_product_valid(self):
+        temp_product = Products(
+            name="Temporary Product",
+            description="Temporary Product Description",
+            quantity=10,
+            price=50000,
+            brand=str(self.testbrand.id),
+            category=str(self.testcategory.id)
+        ).save()
+        
+        url = reverse('product-list') + f"{temp_product.id}/"
+        
+        response = self.client.delete(url)
+        
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Products.objects.filter(id = temp_product.id).count(), 0)
+
+    def test_delete_product_invalid(self):
+        invalid_id = "605c5c5d8f1b2c1e1e1e1e1e"
+        url = reverse('product-list') + f"{invalid_id}/"
+        response = self.client.delete(url)
+        self.assertEqual(response.status_code, 404)
+    
+    
