@@ -1,4 +1,5 @@
 from ..serializers import CategorySerializer
+from ..repository import categoryRepository, CategoryValidationError
 
 class CategoryService:
     
@@ -6,7 +7,9 @@ class CategoryService:
         serializer = CategorySerializer(data=data)
         
         if serializer.is_valid():
-            serializer.save()
-            return {"message": "Category Created Successfully", "category": serializer.data}, None
-        
-        return None, serializer.errors
+            try:
+                categoryRepository.create_category(serializer.data)
+            except Exception as e:
+                raise e
+        else:
+            raise CategoryValidationError("Category data is invalid")

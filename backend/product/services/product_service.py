@@ -1,4 +1,4 @@
-from ..repository import productRepository
+from ..repository import productRepository, ProductNotFound, InvalidProductId, ProductValidationError
 from ..serializers import ProductsSerializer
 
 class ProductService:
@@ -6,20 +6,22 @@ class ProductService:
     def __init__(self):
         self.product_repository = productRepository()
         
-    def get_paginated_products(self, page, page_size, get_product_request, sort_by = '-created_at'):
+    def get_paginated_products(self, page, page_size, get_product_request, sort_by='-created_at'):
         if page < 1 or page_size < 1:
-            return None, {"error": "Invalid pagination values"}
+            raise ValueError('Invalid page or page size')
         
         start = (page - 1) * page_size
         end = start + page_size
         products = self.product_repository.get_all_products(start, end, get_product_request, sort_by)
-        return ProductsSerializer(products, many = True).data
+        return ProductsSerializer(products, many=True).data
     
     def get_product_by_id(self, product_id):
-        product = self.product_repository.get_product_by_id(product_id)
+        if product_id is None:
+            raise InvalidProductId("Product ID must not be none")
         
+        product = self.product_repository.get_product_by_id(product_id)
         if not product:
-            return None
+            raise ProductNotFound(f"Product with id {product_id} not found")
         
         return ProductsSerializer(product).data
     
@@ -28,53 +30,45 @@ class ProductService:
         
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
-            return None, {"error": f"Missing required fields: {', '.join(missing_fields)}"}
+            raise ValueError(f"Missing required fields: {', '.join(missing_fields)}")
         
         if data.get("price") < 0:
-            return None, {"error": "Price cannot be negative"}
+            raise ValueError("Price cannot be negative")
         
         if data.get("quantity") < 0:
-            return None, {"error": "Quantity cannot be negative"}
-        
-        serializer = ProductsSerializer(data=data)
-        
-        if serializer.is_valid():
-            serializer.save()
-            return serializer.data, None
-        
-        return None, serializer.errors   
+            raise ValueError("Quantity cannot be negative")
+
+        product = self.product_repository.create_product(data)
+        if not product:
+            raise ProductValidationError("Failed to create the product due to validation error.")
+    
+        return ProductsSerializer(product).data
     
     def update_product(self, product_id, data):
         required_fields = ["name", "description", "price", "quantity", "category", "brand"]
         
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
-            return None, {"error": f"Missing required fields: {', '.join(missing_fields)}"}
+            raise ValueError(f"Missing required fields: {', '.join(missing_fields)}")
         
         if data.get("price") < 0:
-            return None, {"error": "Price cannot be negative"}
+            raise ValueError("Price cannot be negative")
         
         if data.get("quantity") < 0:
-            return None, {"error": "Quantity cannot be negative"}
+            raise ValueError("Quantity cannot be negative")
         
         product = self.product_repository.get_product_by_id(product_id)
-        
         if not product:
-            return None, {"error": "Product does not exist"}
-
-        serializer = ProductsSerializer(product, data=data, partial=True)
+            raise ProductNotFound(f"Product with id {product_id} not found")
         
-        if serializer.is_valid():
-            serializer.save()
-            return serializer.data, None
-        
-        return None, serializer.errors
+        self.product_repository.update_product(product, data)
 
     def delete_product(self, product_id):
-        product = self.product_repository.get_product_by_id(product_id)
+        if product_id is None:
+            raise InvalidProductId("Product ID must not be none")
         
+        product = self.product_repository.get_product_by_id(product_id)
         if not product:
-            return {"error": "Product does not exist"}, True
-
+            raise ProductNotFound(f"Product with id {product_id} not found")
+        
         self.product_repository.delete_product(product)
-        return {"message": "Product Deleted Successfully"}, False

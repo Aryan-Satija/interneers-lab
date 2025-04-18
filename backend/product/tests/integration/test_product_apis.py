@@ -2,7 +2,7 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 from mongoengine import connect, disconnect
 from product.seed_db import run_seed
-from product.repository import productRepository, categoryRepository, brandRepository
+from product.repository import productRepository, categoryRepository, brandRepository, ProductNotFound, ProductValidationError
 
 product_repository = productRepository()
 category_repository = categoryRepository()
@@ -20,8 +20,7 @@ class ProductAPITestCase(APITestCase):
         
         productTestCaseClass.testbrand = brand_repository.create_brand({'name':"Test Brand", 'description':"Test Description"})
         productTestCaseClass.testcategory = category_repository.create_category({'name': "Test Ctegory", 'description': "Test Description"})
-        productTestCaseClass.testproduct = product_repository.create_product({'name':"Test Product", 'description':"Test Description", 'quantity':10, 'price':100000, 'brand':productTestCaseClass.testbrand, 'category':productTestCaseClass.testcategory})
-        
+        productTestCaseClass.testproduct = product_repository.create_product({'name':"Test Product", 'description':"Test Description", 'quantity':10, 'price':100000, 'brand':str(productTestCaseClass.testbrand.id), 'category':str(productTestCaseClass.testcategory.id)})
         
 
     @classmethod
@@ -140,15 +139,16 @@ class ProductAPITestCase(APITestCase):
         url = url + str(self.testproduct.id) + "/"
         data = {"name": self.testproduct.name, "description": self.testproduct.description, "price": self.testproduct.price, "quantity": self.testproduct.quantity, "category": str(self.testcategory.id), "brand": str(self.testbrand.id)}
         response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 200)
 
-    def test_put_product_invalid(self):
+    def test_put_product_not_found(self):
         invalid_id = "605c5c5d8f1b2c1e1e1e1e1e"
         url = reverse('product-list')
         url = url + invalid_id + "/"
         data = {"name": self.testproduct.name, "description": self.testproduct.description, "price": self.testproduct.price, "quantity": self.testproduct.quantity, "category": str(self.testcategory.id), "brand": str(self.testbrand.id)}
+
         response = self.client.put(url, data, format='json')
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 404)
     
     def test_delete_product_valid(self):
         temp_product = product_repository.create_product(
@@ -167,7 +167,8 @@ class ProductAPITestCase(APITestCase):
         response = self.client.delete(url)
         
         self.assertEqual(response.status_code, 204)
-        self.assertEqual(product_repository.get_product_by_id(temp_product.id), None)
+        with self.assertRaises(ProductNotFound):
+            product_repository.get_product_by_id(temp_product.id)
 
     def test_delete_product_invalid(self):
         invalid_id = "605c5c5d8f1b2c1e1e1e1e1e"
