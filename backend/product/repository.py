@@ -23,7 +23,7 @@ class CategoryNotFound(Exception):
 class BrandNotFound(Exception):
     pass
 
-class productRepository:
+class ProductRepository:
     
     def get_all_products(self, start, end, get_product_request, sort_by = '-created_at'):
         allowed_sorts = ['name', '-name', 'price', '-price', 'created_at', '-created_at', 'updated_at', '-updated_at']
@@ -127,7 +127,7 @@ class productRepository:
         except Exception as e:
             raise RuntimeError(f"An unexpected error occured: {e}")
         
-class categoryRepository:
+class CategoryRepository:
     
     def create_category(self, data):
         try:
@@ -150,7 +150,7 @@ class categoryRepository:
             raise RuntimeError(f"An unexpected error occurred: {e}")
 
         
-class brandRepository:
+class BrandRepository:
     
     def create_brand(self, data):
         try:

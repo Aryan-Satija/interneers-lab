@@ -1,10 +1,10 @@
-from ..repository import productRepository, ProductNotFound, InvalidProductId, ProductValidationError
+from ..repository import ProductRepository, ProductNotFound, InvalidProductId, ProductValidationError
 from ..serializers import ProductsSerializer
 
 class ProductService:
     
     def __init__(self):
-        self.product_repository = productRepository()
+        self.product_repository = ProductRepository()
         
     def get_paginated_products(self, page, page_size, get_product_request, sort_by='-created_at'):
         if page < 1 or page_size < 1:

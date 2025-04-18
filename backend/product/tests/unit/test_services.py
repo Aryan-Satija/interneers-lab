@@ -6,7 +6,7 @@ from product.services.category_service import CategoryService
 
 class TestProductService(unittest.TestCase):
     
-    @patch('product.services.product_service.productRepository')
+    @patch('product.services.product_service.ProductRepository')
     def setUp(self, mockProductRepository):
         self.product_service = ProductService()
         self.product_service.product_repository = mockProductRepository()

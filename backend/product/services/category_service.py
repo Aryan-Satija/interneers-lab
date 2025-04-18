@@ -1,5 +1,5 @@
 from ..serializers import CategorySerializer
-from ..repository import categoryRepository, CategoryValidationError
+from ..repository import CategoryRepository, CategoryValidationError
 
 class CategoryService:
     
@@ -8,7 +8,7 @@ class CategoryService:
         
         if serializer.is_valid():
             try:
-                categoryRepository.create_category(serializer.data)
+                CategoryRepository.create_category(serializer.data)
             except Exception as e:
                 raise e
         else:

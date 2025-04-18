@@ -2,11 +2,11 @@ from rest_framework.test import APITestCase
 from django.urls import reverse
 from mongoengine import connect, disconnect
 from product.seed_db import run_seed
-from product.repository import productRepository, categoryRepository, brandRepository, ProductNotFound, ProductValidationError
+from product.repository import ProductRepository, CategoryRepository, BrandRepository, ProductNotFound, ProductValidationError
 
-product_repository = productRepository()
-category_repository = categoryRepository()
-brand_repository = brandRepository()
+product_repository = ProductRepository()
+category_repository = CategoryRepository()
+brand_repository = BrandRepository()
 
 class ProductAPITestCase(APITestCase):
     

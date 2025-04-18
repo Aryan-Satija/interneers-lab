@@ -1,5 +1,5 @@
 from ..serializers import BrandSerializer
-from ..repository import brandRepository, BrandValidationError
+from ..repository import BrandRepository, BrandValidationError
 class BrandService:
     
     def create_category(self, data):
@@ -7,7 +7,7 @@ class BrandService:
         
         if serializer.is_valid():
             try:
-                brandRepository.create_category(serializer.data)
+                BrandRepository.create_category(serializer.data)
             except Exception as e:
                 raise e
         else:
