@@ -36,9 +36,8 @@ def seed_products(n=20, brands = None, categories = None):
     
     if not categories:
         categories = seed_categories(n)
-        
-    if len(brands) != n or len(categories) != n:
-        return
+    
+    brand_count, category_count = len(brands), len(categories)
     
     for i in range(n):
         product = Products(
@@ -46,8 +45,8 @@ def seed_products(n=20, brands = None, categories = None):
             description=fake.sentence(nb_words=10),
             price=round(random.uniform(10, 1000), 2),
             quantity=random.randint(1, 100),
-            brand=str(brands[i].id),
-            category=str(categories[i].id)
+            brand=str(brands[i%brand_count].id),
+            category=str(categories[i%category_count].id)
         )
         product.save()
 
