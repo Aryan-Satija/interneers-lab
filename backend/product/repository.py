@@ -60,8 +60,6 @@ class ProductRepository:
             raise ProductNotFound("Product does not exist")
         except ValidationError:
             raise InvalidProductId("Invalid product ID")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occured : {e}")
         
     def create_product(self, product_data):
         category_id, brand_id = product_data.get("category"), product_data.get("brand")
@@ -76,15 +74,11 @@ class ProductRepository:
             raise ProductValidationError("Invalid category ID")
         except Brand.DoesNotExist:
             raise ProductValidationError("Invalid brand ID")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occured : {e}")
         
         try:
             return Products.objects.create(**product_data)
         except ValidationError:
             raise ProductValidationError("Product data is invalid")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occured : {e}")
         
     def update_product(self, product, new_product):
         if product is None or new_product is None:
@@ -109,12 +103,8 @@ class ProductRepository:
                     raise AttributeError(f"{item} is not a valid attribute")
             product.save()
             return product
-        except AttributeError as e:
-            raise e
         except ValidationError as e:
             raise ProductValidationError("Product validation failed")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occured: {e}")
     
     def delete_product(self, product):
         if product is None:
@@ -124,8 +114,6 @@ class ProductRepository:
             product.delete()
         except Products.DoesNotExist:
             raise ProductNotFound("Product does not exist")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occured: {e}")
         
 class CategoryRepository:
     
@@ -134,8 +122,6 @@ class CategoryRepository:
             return Category.objects.create(**data)
         except ValidationError:
             raise CategoryValidationError("Category validation failed")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occured: {e}")
         
     def delete_category(self, category_id):
         try:
@@ -146,8 +132,6 @@ class CategoryRepository:
             raise CategoryNotFound("Category not found")
         except ValidationError:
             raise CategoryValidationError("Invalid category ID")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occurred: {e}")
 
         
 class BrandRepository:
@@ -157,8 +141,6 @@ class BrandRepository:
             return Brand.objects.create(**data)
         except ValidationError:
             raise BrandValidationError("Brand validation failed")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occured: {e}")
     
     def delete_brand(self, brand_id):
         try:
@@ -169,6 +151,3 @@ class BrandRepository:
             raise BrandNotFound("Brand not found")
         except ValidationError:
             raise BrandValidationError("Invalid brand ID")
-        except Exception as e:
-            raise RuntimeError(f"An unexpected error occurred: {e}")
-        
