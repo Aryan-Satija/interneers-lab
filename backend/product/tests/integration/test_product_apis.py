@@ -29,8 +29,7 @@ class ProductAPITestCase(APITestCase):
         brand_repository.delete_brand(productTestCaseClass.test_brand.id)
         category_repository.delete_category(productTestCaseClass.test_category.id)
         product_repository.delete_product(productTestCaseClass.test_product)
-        
-        disconnect(alias="inventory")
+
         super().tearDownClass()
     
     def test_get_product_list(self):
