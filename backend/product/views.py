@@ -3,13 +3,14 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from dataclasses import dataclass
 from typing import Optional, List
+from .exceptions import ProductNotFound, InvalidProductId, ProductValidationError, CategoryValidationError, BrandValidationError
 from .services.product_service import ProductService
 from .services.brand_service import BrandService
 from .services.category_service import CategoryService
+
 product_service = ProductService()
 brand_service = BrandService()
 category_service = CategoryService()
-
 
 @dataclass
 class GetProductRequest:
@@ -36,61 +37,76 @@ def product_list_create(request):
         except ValueError:
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
-        products = product_service.get_paginated_products(page, page_size, get_product_request, sort_by)
+        try:
+            products = product_service.get_paginated_products(page, page_size, get_product_request, sort_by)
+            return Response({
+                'page': page,
+                'page_size': page_size,
+                'products': products
+            }) 
+        except ValueError as e:
+            return Response({"error": str(e)}, status=400)
         
-        return Response({
-            'page': page,
-            'page_size': page_size,
-            'products': products
-        }) 
 
     elif request.method == 'POST':
-        data, error = product_service.create_product(request.data)
-        
-        if error:
-            return Response(error, status=400)
-        
-        return Response(data, status=201)
-
+        try:    
+            data = product_service.create_product(request.data)
+            return Response(data, status=201)
+        except (ValueError, ProductValidationError) as e:
+            return Response({"error": str(e)}, 400)
+        except Exception as e:
+            return Response({"error": "Something went wrong"}, 500)
 
 @api_view(['GET', 'PUT', 'DELETE'])
 def product_detail(request, product_id):
     if request.method == 'GET':
-        product = product_service.get_product_by_id(product_id)
-        
-        if not product:
-            return Response({"error": "Product does not exist"}, status=404)
-        
-        return Response(product)
+        try:
+            product = product_service.get_product_by_id(product_id)
+        except ProductNotFound as e:
+            return Response({"error": str(e)}, status=404)
+        except InvalidProductId as e:
+            return Response({"error": str(e)}, status=400)
+        except Exception as e:
+            return Response({"error": "Something went wrong"}, status=500)
+
+        return Response({"product": product}, status=200)
         
     elif request.method == 'PUT':
-        data, error = product_service.update_product(product_id, request.data)
+        try:
+            product_service.update_product(product_id, request.data)
+        except (ValueError, InvalidProductId, ProductValidationError) as e:
+            return Response({"error": str(e)}, status=400)
+        except ProductNotFound as e:
+            return Response({"error": str(e)}, status=404)
         
-        if error:
-            return Response(error, status=400)
-        
-        return Response(data, status=201)
+        return Response({"message": "Product updated successfully"}, status=200)
     
     elif request.method == 'DELETE':
-        product_service.delete_product(product_id)
-        return Response({"message": "Product Deleted Successfully"}, status=204)
+        try:
+            product_service.delete_product(product_id)
+        except InvalidProductId as e:
+            return Response({"error": str(e)}, status=400)
+        except ProductNotFound as e:
+            return Response({"error": str(e)}, status=404)
+        return Response({"message": "Product Deleted Successfully"}, status=204) 
 
 
 @api_view(['POST'])
 def add_brand(request):
-    data, error = brand_service.create_brand(request.data)
-    
-    if error:
-        return Response(error, status=400)
-    
-    return Response(data, status=201)
-
+    try:
+        data = brand_service.create_brand(request.data)
+        return Response(data, status=201)
+    except BrandValidationError as e:
+        return Response({"error": str(e)}, status=400)
+    except Exception as e:
+        return Response({"error": "Something went wrong"}, status=500)   
 
 @api_view(['POST'])
 def add_category(request):
-    data, error = category_service.create_category(request.data)
-    
-    if error:
-        return Response(error, status=400)
-    
-    return Response(data, status=201)
+    try:
+        data = category_service.create_category(request.data)
+        return Response(data, status=201)
+    except CategoryValidationError as e:
+        return Response({"error": str(e)}, status=400)
+    except Exception as e:
+        return Response({"error": "Something went wrong"}, status=500)

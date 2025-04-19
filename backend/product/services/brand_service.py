@@ -1,4 +1,8 @@
 from ..serializers import BrandSerializer
+from ..repository import BrandRepository
+from ..exceptions import BrandValidationError
+
+brand_repository = BrandRepository()
 
 class BrandService:
     
@@ -6,7 +10,7 @@ class BrandService:
         serializer = BrandSerializer(data=data)
         
         if serializer.is_valid():
-            serializer.save()
-            return {"message": "Brand Created Successfully", "brand": serializer.data}, None
-        
-        return None, serializer.errors
+            brand_repository.create_brand(serializer.data)
+        else:
+            raise BrandValidationError("Category data is invalid")   
+

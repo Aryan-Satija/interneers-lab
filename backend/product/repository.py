@@ -1,8 +1,13 @@
 from .models import Products, Category, Brand
 from mongoengine.queryset.visitor import Q
+from mongoengine import ValidationError, DoesNotExist 
+from .exceptions import BrandNotFound, BrandValidationError, CategoryNotFound, CategoryValidationError, ProductNotFound, ProductValidationError, InvalidProductId
 
-class productRepository:
+class ProductRepository:
     
+    def get_product_required_fields(self):
+        return [field for field, field_obj in Products._fields.items() if field_obj.required]
+            
     def get_all_products(self, start, end, get_product_request, sort_by = '-created_at'):
         allowed_sorts = ['name', '-name', 'price', '-price', 'created_at', '-created_at', 'updated_at', '-updated_at']
         
@@ -29,16 +34,101 @@ class productRepository:
         return Products.objects.filter(query).order_by(sort_by)[start:end]
     
     def get_product_by_id(self, product_id):
-        return Products.objects.get(id = product_id)
-    
+        if product_id is None:
+            raise InvalidProductId("Product ID must not be none")
+        
+        try:
+            return Products.objects.get(id = product_id)
+        except Products.DoesNotExist:
+            raise ProductNotFound("Product does not exist")
+        except ValidationError:
+            raise InvalidProductId("Invalid product ID")
+        
     def create_product(self, product_data):
-        return Products.objects.create(**product_data)
-    
+        category_id, brand_id = product_data.get("category"), product_data.get("brand")
+        
+        if category_id is None or brand_id is None:
+            raise ProductValidationError("Category and Brand are required")
+        
+        try:
+            Brand.objects.get(id = brand_id)
+            Category.objects.get(id = category_id)
+        except Category.DoesNotExist:
+            raise ProductValidationError("Invalid category ID")
+        except Brand.DoesNotExist:
+            raise ProductValidationError("Invalid brand ID")
+        
+        try:
+            return Products.objects.create(**product_data)
+        except ValidationError:
+            raise ProductValidationError("Product data is invalid")
+        
     def update_product(self, product, new_product):
-        for item, val in new_product.items():
-            setattr(product, item, val)
-        product.save()
-        return product
+        if product is None or new_product is None:
+            raise ValueError("Product instance and update data must not be none")
+        try:
+            for item, val in new_product.items():
+                if hasattr(product, item):
+                    if item == "category":
+                        category = Category.objects.get(id = val)
+                        if not category:
+                            raise ValueError("Category does not exist")
+                        setattr(product, item, category)
+                    elif item == "brand":
+                        brand = Brand.objects.get(id = val)
+                        if not brand:
+                            raise ValueError("Brand does not exist")
+                        setattr(product, item, brand)
+                    else:
+                        setattr(product, item, val)
+                    
+                else:
+                    raise AttributeError(f"{item} is not a valid attribute")
+            product.save()
+            return product
+        except ValidationError as e:
+            raise ProductValidationError("Product validation failed")
     
     def delete_product(self, product):
-        product.delete()
+        if product is None:
+            raise ValueError("Product to be deleted must be passed in the arguments")
+        
+        try:
+            product.delete()
+        except Products.DoesNotExist:
+            raise ProductNotFound("Product does not exist")
+        
+class CategoryRepository:
+    
+    def create_category(self, data):
+        try:
+            return Category.objects.create(**data)
+        except ValidationError:
+            raise CategoryValidationError("Category validation failed")
+        
+    def delete_category(self, category_id):
+        try:
+            category = Category.objects.get(id=category_id)
+            category.delete()
+        except Category.DoesNotExist:
+            raise CategoryNotFound("Category not found")
+        except ValidationError:
+            raise CategoryValidationError("Invalid category ID")
+
+        
+class BrandRepository:
+    
+    def create_brand(self, data):
+        try:
+            return Brand.objects.create(**data)
+        except ValidationError:
+            raise BrandValidationError("Brand validation failed")
+    
+    def delete_brand(self, brand_id):
+        try:
+            brand = Brand.objects.get(id=brand_id)
+            brand.delete()
+        except Brand.DoesNotExist:
+            raise BrandNotFound("Brand not found")
+        except ValidationError:
+            raise BrandValidationError("Invalid brand ID")
