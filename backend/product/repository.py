@@ -25,6 +25,9 @@ class BrandNotFound(Exception):
 
 class ProductRepository:
     
+    def get_product_required_fields(self):
+        return [field for field, field_obj in Products._fields.items() if field_obj.required]
+            
     def get_all_products(self, start, end, get_product_request, sort_by = '-created_at'):
         allowed_sorts = ['name', '-name', 'price', '-price', 'created_at', '-created_at', 'updated_at', '-updated_at']
         

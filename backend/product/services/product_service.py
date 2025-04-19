@@ -26,7 +26,7 @@ class ProductService:
         return ProductsSerializer(product).data
     
     def create_product(self, data):
-        required_fields = ["name", "description", "price", "quantity", "category", "brand"]
+        required_fields = self.product_repository.get_product_required_fields()
         
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
