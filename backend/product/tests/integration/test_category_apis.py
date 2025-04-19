@@ -36,13 +36,18 @@ class CategoryAPITestCase(APITestCase):
     def test_add_category_missing_name(self):
         url = reverse("category-add")
 
-        payload = {
-            "description": "A test category"
-        }
+        payloads = [
+            {
+                "description": "A test category"
+            }, 
+            {
+                "name": None,
+                "description": "A test category"
+            }
+        ]
 
         original_count = Category.objects.count()
-
-        response = self.client.post(url, payload, format="json")
-
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Category.objects.count(), original_count)
+        for payload in payloads:
+            response = self.client.post(url, payload, format="json")
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Category.objects.count(), original_count)

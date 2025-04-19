@@ -1,15 +1,13 @@
 from ..serializers import CategorySerializer
 from ..repository import CategoryRepository, CategoryValidationError
 
+category_repository = CategoryRepository()
+
 class CategoryService:
     
     def create_category(self, data):
         serializer = CategorySerializer(data=data)
-        
         if serializer.is_valid():
-            try:
-                CategoryRepository.create_category(serializer.data)
-            except Exception as e:
-                raise e
+            category_repository.create_category(serializer.data)
         else:
             raise CategoryValidationError("Category data is invalid")

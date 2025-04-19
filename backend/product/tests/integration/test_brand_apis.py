@@ -35,14 +35,20 @@ class BrandAPITestCase(APITestCase):
     def test_add_brand_missing_name(self):
         url = reverse("brand-add")
         
-        payload = {
-            "description": "A sample brand for testing"
-        }
+        payloads = [
+            {
+                "description": "A sample brand for testing"
+            },
+            {
+                "name": None,
+                "description": "A sample brand for testing"
+            }
+        ]
 
         original = Brand.objects.count()
         
-        response = self.client.post(url, payload, format="json")
-        
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(Brand.objects.count(), original)
+        for payload in payloads:
+            response = self.client.post(url, payload, format="json")
+            self.assertEqual(response.status_code, 400)
+            self.assertEqual(Brand.objects.count(), original)
         
