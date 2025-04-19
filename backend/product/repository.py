@@ -100,7 +100,7 @@ class ProductRepository:
                     elif item == "brand":
                         brand = Brand.objects.get(id = val)
                         if not brand:
-                            raise ValueError("Category does not exist")
+                            raise ValueError("Brand does not exist")
                         setattr(product, item, brand)
                     else:
                         setattr(product, item, val)
@@ -156,7 +156,7 @@ class BrandRepository:
         try:
             return Brand.objects.create(**data)
         except ValidationError:
-            raise BrandValidationError("Category validation failed")
+            raise BrandValidationError("Brand validation failed")
         except Exception as e:
             raise RuntimeError(f"An unexpected error occured: {e}")
     

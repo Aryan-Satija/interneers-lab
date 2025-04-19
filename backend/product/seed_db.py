@@ -32,12 +32,10 @@ def seed_brands(n=5):
 def seed_products(n=20, brands = None, categories = None):
     
     if not brands:
-        brands = seed_brands(n)
+        brands = seed_brands(5)
     
     if not categories:
-        categories = seed_categories(n)
-    
-    brand_count, category_count = len(brands), len(categories)
+        categories = seed_categories(5)
     
     for i in range(n):
         product = Products(
@@ -45,8 +43,8 @@ def seed_products(n=20, brands = None, categories = None):
             description=fake.sentence(nb_words=10),
             price=round(random.uniform(10, 1000), 2),
             quantity=random.randint(1, 100),
-            brand=str(brands[i%brand_count].id),
-            category=str(categories[i%category_count].id)
+            brand=str(random.choices(brands, k=1)[0].id),
+            category=str(random.choices(categories, k=1)[0].id)
         )
         product.save()
 
@@ -56,7 +54,7 @@ def clear_all_collections():
     Brand.drop_collection()
     Products.drop_collection()
 
-def run_seed(cat_n=20, brand_n=20, prod_n=20):
+def run_seed(cat_n=5, brand_n=5, prod_n=20):
     
     clear_all_collections()
     
