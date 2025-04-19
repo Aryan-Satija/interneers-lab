@@ -3,6 +3,7 @@ from django.urls import reverse
 from mongoengine import connect, disconnect
 from product.seed_db import run_seed
 from product.repository import ProductRepository, CategoryRepository, BrandRepository, ProductNotFound, ProductValidationError
+from parameterized import parameterized
 
 product_repository = ProductRepository()
 category_repository = CategoryRepository()
@@ -37,13 +38,12 @@ class ProductAPITestCase(APITestCase):
         response = self.client.get(url, {'page': 1, 'page_size': 5})
         self.assertEqual(response.status_code, 200)
     
-    def test_get_product_list_within_limit(self):
+    @parameterized.expand([ (1,), (2,), (3,), (4,), (5,), (6,), (7,), (8,), (9,), (10,) ])
+    def test_get_product_list_within_limit(self, page_size):
         url = reverse('product-list')
-        page_sizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        
-        for page_size in page_sizes:
-            response = self.client.get(url, {'page': 1, 'page_size': page_size})
-            self.assertLessEqual(len(response.data['products']), page_size)
+        response = self.client.get(url, {'page': 1, 'page_size': page_size})
+        self.assertEqual(response.status_code, 200)
+        self.assertLessEqual(len(response.data['products']), page_size)
     
     def test_pagination_beyond_available_pages(self):
         url = reverse('product-list')
