@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from dataclasses import dataclass
 from typing import Optional, List
-from .repository import ProductNotFound, InvalidProductId, ProductValidationError, CategoryValidationError, BrandValidationError
+from .exceptions import ProductNotFound, InvalidProductId, ProductValidationError, CategoryValidationError, BrandValidationError
 from .services.product_service import ProductService
 from .services.brand_service import BrandService
 from .services.category_service import CategoryService

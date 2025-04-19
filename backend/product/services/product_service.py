@@ -1,4 +1,5 @@
-from ..repository import ProductRepository, ProductNotFound, InvalidProductId, ProductValidationError
+from ..repository import ProductRepository
+from ..exceptions import ProductNotFound, InvalidProductId, ProductValidationError
 from ..serializers import ProductsSerializer
 
 class ProductService:

@@ -1,5 +1,6 @@
 from ..serializers import BrandSerializer
-from ..repository import BrandRepository, BrandValidationError
+from ..repository import BrandRepository
+from ..exceptions import BrandValidationError
 
 brand_repository = BrandRepository()
 

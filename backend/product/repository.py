@@ -1,27 +1,7 @@
 from .models import Products, Category, Brand
 from mongoengine.queryset.visitor import Q
 from mongoengine import ValidationError, DoesNotExist 
-
-class InvalidProductId(Exception):
-    pass
-
-class ProductNotFound(Exception):
-    pass
-
-class ProductValidationError(Exception):
-    pass
-
-class CategoryValidationError(Exception):
-    pass
-
-class BrandValidationError(Exception):
-    pass
-
-class CategoryNotFound(Exception):
-    pass
-
-class BrandNotFound(Exception):
-    pass
+from .exceptions import BrandNotFound, BrandValidationError, CategoryNotFound, CategoryValidationError, ProductNotFound, ProductValidationError, InvalidProductId
 
 class ProductRepository:
     

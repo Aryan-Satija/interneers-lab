@@ -1,5 +1,6 @@
 from ..serializers import CategorySerializer
-from ..repository import CategoryRepository, CategoryValidationError
+from ..repository import CategoryRepository
+from ..exceptions import CategoryValidationError
 
 category_repository = CategoryRepository()
 
