@@ -127,7 +127,6 @@ class CategoryRepository:
         try:
             category = Category.objects.get(id=category_id)
             category.delete()
-            return True
         except Category.DoesNotExist:
             raise CategoryNotFound("Category not found")
         except ValidationError:
@@ -146,7 +145,6 @@ class BrandRepository:
         try:
             brand = Brand.objects.get(id=brand_id)
             brand.delete()
-            return True
         except Brand.DoesNotExist:
             raise BrandNotFound("Brand not found")
         except ValidationError:
