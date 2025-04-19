@@ -95,11 +95,11 @@ class ProductAPITestCase(APITestCase):
         url = reverse('product-list')
         
         bad_products = [
-            { "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
-            { "name": "Apple MacBook Air", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "brand": str(self.test_brand.id) },
+            { "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) }, # no name
+            { "name": "Apple MacBook Air", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) }, # no description
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) }, # no price
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "category": str(self.test_category.id), "brand": str(self.test_brand.id) }, # no quantity
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "brand": str(self.test_brand.id) }, # no category
         ]
         
         for bad_product in bad_products:
