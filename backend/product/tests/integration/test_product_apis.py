@@ -18,17 +18,17 @@ class ProductAPITestCase(APITestCase):
         
         run_seed()
         
-        productTestCaseClass.testbrand = brand_repository.create_brand({'name':"Test Brand", 'description':"Test Description"})
-        productTestCaseClass.testcategory = category_repository.create_category({'name': "Test Ctegory", 'description': "Test Description"})
-        productTestCaseClass.testproduct = product_repository.create_product({'name':"Test Product", 'description':"Test Description", 'quantity':10, 'price':100000, 'brand':str(productTestCaseClass.testbrand.id), 'category':str(productTestCaseClass.testcategory.id)})
+        productTestCaseClass.test_brand = brand_repository.create_brand({'name':"Test Brand", 'description':"Test Description"})
+        productTestCaseClass.test_category = category_repository.create_category({'name': "Test Ctegory", 'description': "Test Description"})
+        productTestCaseClass.test_product = product_repository.create_product({'name':"Test Product", 'description':"Test Description", 'quantity':10, 'price':100000, 'brand':str(productTestCaseClass.test_brand.id), 'category':str(productTestCaseClass.test_category.id)})
         
 
     @classmethod
     def tearDownClass(productTestCaseClass):
         
-        brand_repository.delete_brand(productTestCaseClass.testbrand.id)
-        category_repository.delete_category(productTestCaseClass.testcategory.id)
-        product_repository.delete_product(productTestCaseClass.testproduct)
+        brand_repository.delete_brand(productTestCaseClass.test_brand.id)
+        category_repository.delete_category(productTestCaseClass.test_category.id)
+        product_repository.delete_product(productTestCaseClass.test_product)
         
         disconnect(alias="inventory")
         super().tearDownClass()
@@ -75,7 +75,7 @@ class ProductAPITestCase(APITestCase):
     def test_get_product_list_combined_filters(self):
         
         url = reverse('product-list')
-        filters = {'name': self.testproduct.name, 'min_price': 10000, 'max_price': 50000, 'page': 1, 'page_size': 5}
+        filters = {'name': self.test_product.name, 'min_price': 10000, 'max_price': 50000, 'page': 1, 'page_size': 5}
         response = self.client.get(url, filters)
         
         self.assertEqual(response.status_code, 200)
@@ -89,18 +89,18 @@ class ProductAPITestCase(APITestCase):
         
     def test_create_product_valid(self):
         url = reverse('product-list')
-        response = self.client.post(url, { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) }, format="json")
+        response = self.client.post(url, { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) }, format="json")
         self.assertEqual(response.status_code, 201)
 
     def test_create_product_missing_product_details(self):
         url = reverse('product-list')
         
         bad_products = [
-            { "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
-            { "name": "Apple MacBook Air", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) },
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "brand": str(self.testbrand.id) },
+            { "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
+            { "name": "Apple MacBook Air", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "category": str(self.test_category.id), "brand": str(self.test_brand.id) },
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "brand": str(self.test_brand.id) },
         ]
         
         for bad_product in bad_products:
@@ -111,10 +111,10 @@ class ProductAPITestCase(APITestCase):
         url = reverse('product-list')
         
         bad_products = [
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": -100000, "quantity": 5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) }, # negative price
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": -5, "category": str(self.testcategory.id), "brand": str(self.testbrand.id) }, # negative quantity
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": str(self.testbrand.id) }, # non-existent category
-            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.testcategory.id), "brand": "67dc2fb0fead7871ab74c197" }, # non-existent brand
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": -100000, "quantity": 5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) }, # negative price
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": -5, "category": str(self.test_category.id), "brand": str(self.test_brand.id) }, # negative quantity
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": "67e8ef6bd739b2427101bddc", "brand": str(self.test_brand.id) }, # non-existent category
+            { "name": "Apple MacBook Air", "description": "Apple M4 chip with 10-core CPU", "price": 100000, "quantity": 5, "category": str(self.test_category.id), "brand": "67dc2fb0fead7871ab74c197" }, # non-existent brand
         ]
         
         for bad_product in bad_products:
@@ -123,7 +123,7 @@ class ProductAPITestCase(APITestCase):
     
     def test_get_product_details_valid(self):
         url = reverse('product-list')
-        url = url + str(self.testproduct.id) + "/"
+        url = url + str(self.test_product.id) + "/"
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
@@ -136,8 +136,8 @@ class ProductAPITestCase(APITestCase):
         
     def test_put_product_valid(self):
         url = reverse('product-list')
-        url = url + str(self.testproduct.id) + "/"
-        data = {"name": self.testproduct.name, "description": self.testproduct.description, "price": self.testproduct.price, "quantity": self.testproduct.quantity, "category": str(self.testcategory.id), "brand": str(self.testbrand.id)}
+        url = url + str(self.test_product.id) + "/"
+        data = {"name": self.test_product.name, "description": self.test_product.description, "price": self.test_product.price, "quantity": self.test_product.quantity, "category": str(self.test_category.id), "brand": str(self.test_brand.id)}
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 200)
 
@@ -145,7 +145,7 @@ class ProductAPITestCase(APITestCase):
         invalid_id = "605c5c5d8f1b2c1e1e1e1e1e"
         url = reverse('product-list')
         url = url + invalid_id + "/"
-        data = {"name": self.testproduct.name, "description": self.testproduct.description, "price": self.testproduct.price, "quantity": self.testproduct.quantity, "category": str(self.testcategory.id), "brand": str(self.testbrand.id)}
+        data = {"name": self.test_product.name, "description": self.test_product.description, "price": self.test_product.price, "quantity": self.test_product.quantity, "category": str(self.test_category.id), "brand": str(self.test_brand.id)}
 
         response = self.client.put(url, data, format='json')
         self.assertEqual(response.status_code, 404)
@@ -157,8 +157,8 @@ class ProductAPITestCase(APITestCase):
                 'description':"Temporary Product Description",
                 'quantity':10,
                 'price':50000,
-                'brand':str(self.testbrand.id),
-                'category':str(self.testcategory.id)
+                'brand':str(self.test_brand.id),
+                'category':str(self.test_category.id)
             }
         )
         
