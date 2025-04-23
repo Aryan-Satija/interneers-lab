@@ -1,12 +1,19 @@
 const container = document.getElementById("product-container")
 
 async function getProducts(){
+    container.innerHTML = "";
+
     const spinner = document.createElement("div");
     spinner.className = "spinner"
     container.appendChild(spinner)
 
     try{
-        const response = await fetch("http://localhost:8000/api/v1/product")
+        const response = await fetch("http://localhost:8000/api/v1/product?page_size=-5")
+        
+        if(!response.ok){
+            throw new Error("Failed to fetch products: " + response.statusText);
+        }
+
         const data = await response.json();
         
         spinner.remove()
