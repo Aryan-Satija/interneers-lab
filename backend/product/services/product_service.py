@@ -18,11 +18,11 @@ class ProductService:
     
     def get_product_by_id(self, product_id):
         if product_id is None:
-            raise InvalidProductId("Product ID must not be none")
+            raise InvalidProductId(product_id)
         
         product = self.product_repository.get_product_by_id(product_id)
         if not product:
-            raise ProductNotFound(f"Product with id {product_id} not found")
+            raise ProductNotFound(product_id)
         
         return ProductsSerializer(product).data
     
@@ -40,8 +40,9 @@ class ProductService:
             raise ValueError("Quantity cannot be negative")
 
         product = self.product_repository.create_product(data)
+        
         if not product:
-            raise ProductValidationError("Failed to create the product due to validation error.")
+            raise ProductValidationError()
     
         return ProductsSerializer(product).data
     
@@ -60,16 +61,16 @@ class ProductService:
         
         product = self.product_repository.get_product_by_id(product_id)
         if not product:
-            raise ProductNotFound(f"Product with id {product_id} not found")
+            raise ProductNotFound(product_id)
         
         self.product_repository.update_product(product, data)
 
     def delete_product(self, product_id):
         if product_id is None:
-            raise InvalidProductId("Product ID must not be none")
+            raise InvalidProductId(product_id)
         
         product = self.product_repository.get_product_by_id(product_id)
         if not product:
-            raise ProductNotFound(f"Product with id {product_id} not found")
+            raise ProductNotFound(product_id)
         
         self.product_repository.delete_product(product)

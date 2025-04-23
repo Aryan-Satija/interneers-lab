@@ -35,14 +35,14 @@ class ProductRepository:
     
     def get_product_by_id(self, product_id):
         if product_id is None:
-            raise InvalidProductId("Product ID must not be none")
+            raise InvalidProductId(product_id)
         
         try:
             return Products.objects.get(id = product_id)
         except Products.DoesNotExist:
-            raise ProductNotFound("Product does not exist")
+            raise ProductNotFound(product_id)
         except ValidationError:
-            raise InvalidProductId("Invalid product ID")
+            raise InvalidProductId(product_id)
         
     def create_product(self, product_data):
         category_id, brand_id = product_data.get("category"), product_data.get("brand")
@@ -96,7 +96,7 @@ class ProductRepository:
         try:
             product.delete()
         except Products.DoesNotExist:
-            raise ProductNotFound("Product does not exist")
+            raise ProductNotFound(product.id)
         
 class CategoryRepository:
     
@@ -111,7 +111,7 @@ class CategoryRepository:
             category = Category.objects.get(id=category_id)
             category.delete()
         except Category.DoesNotExist:
-            raise CategoryNotFound("Category not found")
+            raise CategoryNotFound(category_id)
         except ValidationError:
             raise CategoryValidationError("Invalid category ID")
 
@@ -129,6 +129,6 @@ class BrandRepository:
             brand = Brand.objects.get(id=brand_id)
             brand.delete()
         except Brand.DoesNotExist:
-            raise BrandNotFound("Brand not found")
+            raise BrandNotFound(brand_id)
         except ValidationError:
             raise BrandValidationError("Invalid brand ID")
