@@ -1,7 +1,8 @@
 from .models import Products, Category, Brand
 from mongoengine.queryset.visitor import Q
-from mongoengine import ValidationError, DoesNotExist 
+from mongoengine import ValidationError 
 from .exceptions import BrandNotFound, BrandValidationError, CategoryNotFound, CategoryValidationError, ProductNotFound, ProductValidationError, InvalidProductId
+from mongoengine import ReferenceField
 
 class ProductRepository:
     
@@ -63,29 +64,45 @@ class ProductRepository:
         except ValidationError:
             raise ProductValidationError("Product data is invalid")
         
-    def update_product(self, product, new_product):
-        if product is None or new_product is None:
-            raise ValueError("Product instance and update data must not be none")
+    def update_product(self, product_id, data):
+        if product_id is None or data is None:
+            raise ValueError("Product ID and update data must not be none")
+        
+        excluded_fields = {'id', '_id'}
+        
+        reference_fields = {
+            field: field_obj for field, field_obj in Products._fields.items() 
+            if isinstance(field_obj, ReferenceField)
+        }
+
+        other_fields = {
+            field: field_obj for field, field_obj in Products._fields.items()
+            if field not in reference_fields
+            and field not in excluded_fields
+        }
+
+        update_data = {}
+    
+        for field, field_obj in reference_fields.items():
+            if field in data:
+                try:
+                    ref_model = field_obj.document_type
+                    ref_doc = ref_model.objects.get(id=data[field])
+                    update_data[f"set__{field}"] = ref_doc
+                except ref_model.DoesNotExist:
+                    raise ProductValidationError(f"Invalid reference for '{field}'")
+                except Exception:
+                    raise ProductValidationError(f"Invalid ID format for '{field}'")
+
+        for field in other_fields:
+            if field in data:
+                update_data[f"set__{field}"] = data[field]
+                  
         try:
-            for item, val in new_product.items():
-                if hasattr(product, item):
-                    if item == "category":
-                        category = Category.objects.get(id = val)
-                        if not category:
-                            raise ValueError("Category does not exist")
-                        setattr(product, item, category)
-                    elif item == "brand":
-                        brand = Brand.objects.get(id = val)
-                        if not brand:
-                            raise ValueError("Brand does not exist")
-                        setattr(product, item, brand)
-                    else:
-                        setattr(product, item, val)
-                    
-                else:
-                    raise AttributeError(f"{item} is not a valid attribute")
-            product.save()
-            return product
+            Products.objects(id=product_id).update(**update_data)            
+            return Products.objects.get(id=product_id)
+        except Products.DoesNotExist:
+            raise ProductNotFound(product_id)
         except ValidationError as e:
             raise ProductValidationError("Product validation failed")
     

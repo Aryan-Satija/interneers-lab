@@ -59,11 +59,7 @@ class ProductService:
         if data.get("quantity") < 0:
             raise ValueError("Quantity cannot be negative")
         
-        product = self.product_repository.get_product_by_id(product_id)
-        if not product:
-            raise ProductNotFound(product_id)
-        
-        self.product_repository.update_product(product, data)
+        self.product_repository.update_product(product_id, data)
 
     def delete_product(self, product_id):
         if product_id is None:
