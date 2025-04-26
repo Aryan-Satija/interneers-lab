@@ -135,7 +135,7 @@ load_dotenv()
 
 MONGO_USER = os.getenv("MONGO_USER")
 MONGO_PASS = os.getenv("MONGO_PASS")
-USE_LOCAL_DB = os.getenv("USE_LOCAL_DB", False) == "true"
+USE_LOCAL_DB = os.getenv("USE_LOCAL_DB", "true") == "true"
 
 if USE_LOCAL_DB:
     print("connecting to local db")
