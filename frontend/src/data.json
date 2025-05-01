@@ -1,0 +1,182 @@
+[
+  {
+    "id": "60d99b8e0c85b93fd8e58f0a",
+    "name": "Laptop X1",
+    "price": 899,
+    "quantity": 15,
+    "description": "A high-performance laptop built for both intense gaming sessions and demanding work tasks, ensuring smooth multitasking and speed.",
+    "category": "Laptops",
+    "brand": "BrandA"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f0b",
+    "name": "Laptop Pro",
+    "price": 1299,
+    "quantity": 20,
+    "description": "A professional-grade laptop featuring top-tier specifications, ideal for software developers, designers, and content creators.",
+    "category": "Laptops",
+    "brand": "BrandB"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f0c",
+    "name": "Phone Z",
+    "price": 699,
+    "quantity": 30,
+    "description": "The latest smartphone packed with cutting-edge features including AI-powered cameras, high refresh rate display, and powerful chipset.",
+    "category": "Phones",
+    "brand": "BrandC"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f0d",
+    "name": "Phone X",
+    "price": 499,
+    "quantity": 25,
+    "description": "An affordable yet reliable smartphone offering a great balance of performance, battery life, and build quality for everyday use.",
+    "category": "Phones",
+    "brand": "BrandD"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f0e",
+    "name": "Nerf Blaster",
+    "price": 19.99,
+    "quantity": 50,
+    "description": "A fun and exciting Nerf gun suitable for all ages, designed for indoor and outdoor play with safe foam darts.",
+    "category": "Toys",
+    "brand": "Nerf"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f0f",
+    "name": "Laptop V2",
+    "price": 750,
+    "quantity": 10,
+    "description": "A budget-friendly laptop perfect for students and everyday computing needs, featuring solid performance and lightweight build.",
+    "category": "Laptops",
+    "brand": "BrandE"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f10",
+    "name": "Smartphone 12",
+    "price": 799,
+    "quantity": 40,
+    "description": "A sleek smartphone equipped with a high-quality camera, long battery life, and 5G capabilities for modern connectivity.",
+    "category": "Phones",
+    "brand": "BrandF"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f11",
+    "name": "Nerf Elite",
+    "price": 24.99,
+    "quantity": 60,
+    "description": "An elite series Nerf blaster that shoots darts with high accuracy and range, perfect for competitive play.",
+    "category": "Toys",
+    "brand": "Nerf"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f12",
+    "name": "Tablet T7",
+    "price": 399,
+    "quantity": 35,
+    "description": "An affordable tablet offering decent performance, ideal for streaming, browsing, and light productivity tasks on the go.",
+    "category": "Tablets",
+    "brand": "BrandG"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f13",
+    "name": "Phone 11X",
+    "price": 899,
+    "quantity": 12,
+    "description": "A flagship smartphone with a stunning display and excellent camera quality, delivering top-notch performance for power users.",
+    "category": "Phones",
+    "brand": "BrandH"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f14",
+    "name": "Nerf Rival",
+    "price": 39.99,
+    "quantity": 70,
+    "description": "A high-powered Nerf blaster from the Rival series, offering precision targeting and rapid fire for advanced users.",
+    "category": "Toys",
+    "brand": "Nerf"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f15",
+    "name": "Gaming Laptop",
+    "price": 1499,
+    "quantity": 8,
+    "description": "A powerful gaming laptop designed with high refresh rate display, dedicated GPU, and advanced cooling system.",
+    "category": "Laptops",
+    "brand": "BrandI"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f16",
+    "name": "Phone Z Pro",
+    "price": 999,
+    "quantity": 18,
+    "description": "A pro-level phone with a gorgeous AMOLED display, superior build quality, and blazing fast performance across apps and games.",
+    "category": "Phones",
+    "brand": "BrandJ"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f17",
+    "name": "Smartphone S",
+    "price": 599,
+    "quantity": 45,
+    "description": "A great value mid-range smartphone combining smooth performance, decent camera, and modern design for everyday users.",
+    "category": "Phones",
+    "brand": "BrandK"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f18",
+    "name": "Laptop GT",
+    "price": 1799,
+    "quantity": 5,
+    "description": "A high-end gaming laptop featuring a powerful CPU, RTX GPU, and ultra-fast SSD, perfect for immersive gaming experiences.",
+    "category": "Laptops",
+    "brand": "BrandL"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f19",
+    "name": "Nerf Ultra",
+    "price": 49.99,
+    "quantity": 55,
+    "description": "The ultimate Nerf blaster offering longer-range darts and superior design for extended outdoor fun and performance.",
+    "category": "Toys",
+    "brand": "Nerf"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f1a",
+    "name": "Phone S10",
+    "price": 850,
+    "quantity": 20,
+    "description": "A stylish flagship smartphone with top specs, vibrant display, and excellent camera system for content creation.",
+    "category": "Phones",
+    "brand": "BrandM"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f1b",
+    "name": "Laptop Light",
+    "price": 550,
+    "quantity": 30,
+    "description": "A lightweight and budget-friendly laptop ideal for students and travelers, offering decent specs in a slim form factor.",
+    "category": "Laptops",
+    "brand": "BrandN"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f1c",
+    "name": "Nerf Zombie Strike",
+    "price": 29.99,
+    "quantity": 60,
+    "description": "A zombie-themed Nerf blaster designed for imaginative missions and role-playing with unique green foam darts.",
+    "category": "Toys",
+    "brand": "Nerf"
+  },
+  {
+    "id": "60d99b8e0c85b93fd8e58f1d",
+    "name": "Smartphone V",
+    "price": 999,
+    "quantity": 22,
+    "description": "A premium smartphone that features 5G connectivity, crisp OLED display, and long-lasting battery for power users.",
+    "category": "Phones",
+    "brand": "BrandO"
+  }
+]
