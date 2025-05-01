@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layout } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
 import { Bookmark, Eye, Pencil } from "lucide-react";
@@ -39,8 +39,35 @@ const layoutStyle = {
   height: "100%",
 };
 
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  category: string;
+  brand: string;
+}
+
 const Product: React.FC = () => {
   const [mode, setMode] = useState<number>(0);
+  const [bookmark, setBookmark] = useState<Product[]>([]);
+  const toggleBookmark = (product: Product) => {
+    setBookmark((prev) => {
+      return prev.some((item) => item.id === product.id)
+        ? prev.filter((item) => item.id !== product.id)
+        : [...prev, product];
+    });
+    localStorage.setItem("bookmarked", JSON.stringify(bookmark));
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("bookmarked") !== null) {
+      setBookmark((prev) =>
+        JSON.parse(localStorage.getItem("bookmarked") || "[]"),
+      );
+    }
+  }, []);
 
   return (
     <div className="w-screen h-screen">
@@ -70,7 +97,12 @@ const Product: React.FC = () => {
                     />
                     <Bookmark
                       size={22}
-                      className="text-gray-600 hover:text-sky-600 cursor-pointer hover:animate-ping"
+                      className={`cursor-pointer hover:animate-ping ${
+                        bookmark.some((item) => item.id === product.id)
+                          ? "text-sky-600 -translate-y-1"
+                          : "text-gray-600"
+                      }`}
+                      onClick={() => toggleBookmark(product)}
                     />
                     <Pencil
                       size={22}
