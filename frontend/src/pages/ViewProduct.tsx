@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Skeleton } from "antd";
+import { Layout, Skeleton, Button, Input } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 
 const { Header, Sider, Content } = Layout;
@@ -52,7 +52,9 @@ const ViewProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
-
+  const [updatedProduct, setUpdatedProduct] = useState<Product | null>(null);
+  const [searchParams] = useSearchParams();
+  const isEdit = searchParams.get("edit") === "true";
   const handleImageLoad = () => {
     setImageLoaded(true);
   };
@@ -62,6 +64,16 @@ const ViewProduct: React.FC = () => {
     if (!id) return;
     setTimeout(() => {
       setProduct({
+        id: id,
+        name: "Laptop Pro",
+        price: 1299,
+        quantity: 20,
+        description:
+          "A professional-grade laptop featuring top-tier specifications, ideal for software developers, designers, and content creators.",
+        category: "Laptops",
+        brand: "Dell",
+      });
+      setUpdatedProduct({
         id: id,
         name: "Laptop Pro",
         price: 1299,
@@ -100,45 +112,162 @@ const ViewProduct: React.FC = () => {
                 transition={{ duration: 1 }}
                 className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md text-left"
               >
-                <div className="flex flex-col h-[440px] items-center justify-center w-full">
-                  {!imageLoaded && (
-                    <Skeleton.Image
-                      style={{ width: "100%", marginBottom: 16 }}
-                      active
-                    />
-                  )}
-                  <img
-                    src={`https://picsum.photos/600/400?random=${id}`}
-                    alt="Product"
-                    className={`rounded-lg w-full mb-4 ${!imageLoaded ? "hidden" : ""}`}
-                    onLoad={handleImageLoad}
-                  />
-                </div>
-                {product ? (
+                {isEdit && (
                   <>
-                    <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                      {product.name}
-                    </h2>
-                    <p className="text-gray-600 mb-4">{product.description}</p>
-                    <div className="text-sm text-gray-500">
-                      <p>Price: ₹{product.price}</p>
-                      <p>Quantity: {product.quantity}</p>
-                      <p>
-                        Category:{" "}
-                        <span className="text-sky-800 bg-sky-400/40 px-2 rounded-full">
-                          {product.category}
-                        </span>
-                      </p>
-                      <p>
-                        Brand:{" "}
-                        <span className="text-green-800 bg-green-400/40 px-2 rounded-full">
-                          {product.brand}
-                        </span>
-                      </p>
+                    <div className="flex flex-col h-[440px] items-center justify-center w-full">
+                      {!imageLoaded && (
+                        <Skeleton.Image
+                          style={{ width: "100%", marginBottom: 16 }}
+                          active
+                        />
+                      )}
+                      <img
+                        src={`https://picsum.photos/600/400?random=${id}`}
+                        alt="Product"
+                        className={`rounded-lg w-full mb-4 ${!imageLoaded ? "hidden" : ""}`}
+                        onLoad={handleImageLoad}
+                      />
                     </div>
+                    {product ? (
+                      <>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+                          <Input
+                            value={updatedProduct?.name}
+                            onChange={(e) =>
+                              setUpdatedProduct((prev) =>
+                                prev ? { ...prev, name: e.target.value } : prev,
+                              )
+                            }
+                          />
+                        </h2>
+                        <p className="text-gray-600 mb-4">
+                          <Input.TextArea
+                            rows={3}
+                            value={updatedProduct?.description}
+                            onChange={(e) =>
+                              setUpdatedProduct((prev) =>
+                                prev
+                                  ? { ...prev, description: e.target.value }
+                                  : prev,
+                              )
+                            }
+                          />
+                        </p>
+                        <div className="text-sm text-gray-500 flex flex-col gap-2">
+                          <p>
+                            Price: ₹{" "}
+                            <Input
+                              type="number"
+                              value={updatedProduct?.price}
+                              onChange={(e) =>
+                                setUpdatedProduct((prev) =>
+                                  prev
+                                    ? { ...prev, price: Number(e.target.value) }
+                                    : prev,
+                                )
+                              }
+                            />
+                          </p>
+                          <p>
+                            Quantity:{" "}
+                            <Input
+                              type="number"
+                              value={updatedProduct?.quantity}
+                              onChange={(e) =>
+                                setUpdatedProduct((prev) =>
+                                  prev
+                                    ? {
+                                        ...prev,
+                                        quantity: Number(e.target.value),
+                                      }
+                                    : prev,
+                                )
+                              }
+                            />
+                          </p>
+                          <p>
+                            Category:{" "}
+                            <Input
+                              value={updatedProduct?.category}
+                              onChange={(e) =>
+                                setUpdatedProduct((prev) =>
+                                  prev
+                                    ? { ...prev, category: e.target.value }
+                                    : prev,
+                                )
+                              }
+                            />
+                          </p>
+                          <p>
+                            Brand:{" "}
+                            <Input
+                              value={updatedProduct?.brand}
+                              onChange={(e) =>
+                                setUpdatedProduct((prev) =>
+                                  prev
+                                    ? { ...prev, brand: e.target.value }
+                                    : prev,
+                                )
+                              }
+                            />
+                          </p>
+                        </div>
+                        <div>
+                          <Button type="default" className="mt-4">
+                            Update
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <Skeleton active />
+                    )}
                   </>
-                ) : (
-                  <Skeleton active />
+                )}
+                {!isEdit && (
+                  <>
+                    <div className="flex flex-col h-[440px] items-center justify-center w-full">
+                      {!imageLoaded && (
+                        <Skeleton.Image
+                          style={{ width: "100%", marginBottom: 16 }}
+                          active
+                        />
+                      )}
+                      <img
+                        src={`https://picsum.photos/600/400?random=${id}`}
+                        alt="Product"
+                        className={`rounded-lg w-full mb-4 ${!imageLoaded ? "hidden" : ""}`}
+                        onLoad={handleImageLoad}
+                      />
+                    </div>
+                    {product ? (
+                      <>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+                          {product.name}
+                        </h2>
+                        <p className="text-gray-600 mb-4">
+                          {product.description}
+                        </p>
+                        <div className="text-sm text-gray-500 flex flex-col gap-2">
+                          <p>Price: ₹{product.price}</p>
+                          <p>Quantity: {product.quantity}</p>
+                          <p>
+                            Category:{" "}
+                            <span className="text-sky-800 bg-sky-400/40 px-2 rounded-full">
+                              {product.category}
+                            </span>
+                          </p>
+                          <p>
+                            Brand:{" "}
+                            <span className="text-green-800 bg-green-400/40 px-2 rounded-full">
+                              {product.brand}
+                            </span>
+                          </p>
+                        </div>
+                      </>
+                    ) : (
+                      <Skeleton active />
+                    )}
+                  </>
                 )}
               </motion.div>
             }

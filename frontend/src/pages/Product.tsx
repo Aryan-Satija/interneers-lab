@@ -120,6 +120,9 @@ const Product: React.FC = () => {
                       <Pencil
                         size={22}
                         className="text-gray-600 hover:text-sky-600 cursor-pointer hover:animate-ping"
+                        onClick={() => {
+                          navigate(`/products/${product.id}?edit=true`);
+                        }}
                       />
                     </div>
 
