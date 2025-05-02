@@ -16,15 +16,19 @@ interface Product {
 
 interface productListInterface {
   data: Product[];
+  bookmark: Product[];
+  setBookmark: React.Dispatch<React.SetStateAction<Product[]>>;
 }
 
-const Productlist: React.FC<productListInterface> = ({ data }) => {
+const Productlist: React.FC<productListInterface> = ({
+  data,
+  bookmark,
+  setBookmark,
+}) => {
   const navigate = useNavigate();
 
-  const [bookmark, setBookmark] = useState<Product[]>([]);
-
   useEffect(() => {
-    if (bookmark.length > 0)
+    if (bookmark.length >= 0)
       localStorage.setItem("bookmarked", JSON.stringify(bookmark));
   }, [bookmark]);
 
@@ -37,6 +41,7 @@ const Productlist: React.FC<productListInterface> = ({ data }) => {
   }, []);
 
   const toggleBookmark = (product: Product) => {
+    console.log(product);
     setBookmark((prev) => {
       return prev.some((item) => item.id === product.id)
         ? prev.filter((item) => item.id !== product.id)

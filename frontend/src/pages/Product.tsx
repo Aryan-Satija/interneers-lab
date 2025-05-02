@@ -38,9 +38,19 @@ const layoutStyle = {
   height: "100%",
 };
 
+interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  category: string;
+  brand: string;
+}
+
 const Product: React.FC = () => {
   const [mode, setMode] = useState<number>(0);
-
+  const [bookmark, setBookmark] = useState<Product[]>([]);
   return (
     <div className="w-screen h-screen">
       <Layout style={layoutStyle}>
@@ -52,7 +62,20 @@ const Product: React.FC = () => {
             <Breadcrumbs />
           </Header>
           <Content style={contentStyle}>
-            <Productlist data={data} />
+            {mode === 0 && (
+              <Productlist
+                data={data}
+                bookmark={bookmark}
+                setBookmark={setBookmark}
+              />
+            )}
+            {mode === 2 && (
+              <Productlist
+                data={bookmark}
+                bookmark={bookmark}
+                setBookmark={setBookmark}
+              />
+            )}
           </Content>
         </Layout>
       </Layout>
