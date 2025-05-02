@@ -4,6 +4,7 @@ import Breadcrumbs from "components/Breadcrumbs";
 import Sidebar from "components/Sidebar";
 import data from "../data.json";
 import Productlist from "components/Productlist";
+import CreateProduct from "components/createProduct";
 
 const { Header, Sider, Content } = Layout;
 
@@ -19,9 +20,10 @@ const headerStyle: React.CSSProperties = {
 const contentStyle: React.CSSProperties = {
   textAlign: "center",
   minHeight: 120,
-  color: "#fff",
+  color: "#111",
   backgroundColor: "#f0f0f1",
-  overflow: "scroll",
+  overflow: "auto",
+  padding: "2rem",
 };
 
 const siderStyle: React.CSSProperties = {
@@ -69,6 +71,7 @@ const Product: React.FC = () => {
                 setBookmark={setBookmark}
               />
             )}
+            {mode === 1 && <CreateProduct />}
             {mode === 2 && (
               <Productlist
                 data={bookmark}

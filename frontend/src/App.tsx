@@ -4,6 +4,8 @@ import Home from "pages/Home";
 import Product from "pages/Product";
 import ViewProduct from "pages/ViewProduct";
 import "./App.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
@@ -13,6 +15,7 @@ function App() {
         <Route path="/products" element={<Product />} />
         <Route path="/products/:id" element={<ViewProduct />} />
       </Routes>
+      <ToastContainer />
     </div>
   );
 }
