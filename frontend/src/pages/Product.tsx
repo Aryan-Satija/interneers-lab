@@ -61,8 +61,12 @@ const Product: React.FC = () => {
         ? prev.filter((item) => item.id !== product.id)
         : [...prev, product];
     });
-    localStorage.setItem("bookmarked", JSON.stringify(bookmark));
   };
+
+  useEffect(() => {
+    if (bookmark.length > 0)
+      localStorage.setItem("bookmarked", JSON.stringify(bookmark));
+  }, [bookmark]);
 
   useEffect(() => {
     if (localStorage.getItem("bookmarked") !== null) {
