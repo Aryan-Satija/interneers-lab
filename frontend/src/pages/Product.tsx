@@ -5,6 +5,8 @@ import { Bookmark, Eye, Pencil } from "lucide-react";
 import data from "../data.json";
 import { motion } from "framer-motion";
 import Sidebar from "components/Sidebar";
+import { Skeleton } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
@@ -52,6 +54,7 @@ interface Product {
 const Product: React.FC = () => {
   const [mode, setMode] = useState<number>(0);
   const [bookmark, setBookmark] = useState<Product[]>([]);
+  const navigate = useNavigate();
   const toggleBookmark = (product: Product) => {
     setBookmark((prev) => {
       return prev.some((item) => item.id === product.id)
@@ -69,6 +72,12 @@ const Product: React.FC = () => {
     }
   }, []);
 
+  const [imageLoaded, setImageLoaded] = useState<Record<number, boolean>>({});
+
+  const handleImageLoad = (index: number) => {
+    setImageLoaded((prev) => ({ ...prev, [index]: true }));
+  };
+
   return (
     <div className="w-screen h-screen">
       <Layout style={layoutStyle}>
@@ -81,49 +90,68 @@ const Product: React.FC = () => {
           </Header>
           <Content style={contentStyle}>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6 w-[80%] mx-auto">
-              {data.map((product, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8, y: 30 }}
-                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={{ duration: 0.4, delay: index * 0.05 }}
-                  className="bg-white cursor-pointer rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 px-4 flex flex-col items-start relative overflow-hidden"
-                >
-                  <div className="absolute top-[8px] left-4 flex gap-4 z-10">
-                    <Eye
-                      size={22}
-                      className="text-gray-600 hover:text-sky-600 cursor-pointer hover:animate-ping"
-                    />
-                    <Bookmark
-                      size={22}
-                      className={`cursor-pointer hover:animate-ping ${
-                        bookmark.some((item) => item.id === product.id)
-                          ? "text-sky-600 -translate-y-1"
-                          : "text-gray-600"
-                      }`}
-                      onClick={() => toggleBookmark(product)}
-                    />
-                    <Pencil
-                      size={22}
-                      className="text-gray-600 hover:text-sky-600 cursor-pointer hover:animate-ping"
-                    />
-                  </div>
+              {data.map((product, index) => {
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, scale: 0.8, y: 30 }}
+                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.2 }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    className="bg-white cursor-pointer rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 px-4 flex flex-col items-start relative overflow-hidden"
+                  >
+                    <div className="absolute top-[8px] left-4 flex gap-4 z-10">
+                      <Eye
+                        size={22}
+                        className="text-gray-600 hover:text-sky-600 cursor-pointer hover:animate-ping"
+                        onClick={() => {
+                          navigate(`/products/${product.id}`);
+                        }}
+                      />
+                      <Bookmark
+                        size={22}
+                        className={`cursor-pointer hover:animate-ping ${
+                          bookmark.some((item) => item.id === product.id)
+                            ? "text-sky-600 -translate-y-1"
+                            : "text-gray-600"
+                        }`}
+                        onClick={() => toggleBookmark(product)}
+                      />
+                      <Pencil
+                        size={22}
+                        className="text-gray-600 hover:text-sky-600 cursor-pointer hover:animate-ping"
+                      />
+                    </div>
 
-                  <img
-                    src={`https://picsum.photos/200/300?random=${index}`}
-                    alt="avatar"
-                    className="w-full rounded-md h-[20rem] mt-8 mb-2"
-                  />
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {product.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">{product.description}</p>
-                  <div className="my-4 w-full text-right text-sky-600 font-semibold">
-                    ₹{product.price}
-                  </div>
-                </motion.div>
-              ))}
+                    {!imageLoaded[index] && (
+                      <div className="w-full h-[20rem] mt-8 mb-2 flex flex-col items-center justify-center">
+                        <Skeleton.Image
+                          style={{ width: "100%", height: "100%" }}
+                          active
+                        />
+                      </div>
+                    )}
+                    <img
+                      src={`https://picsum.photos/200/300?random=${index}`}
+                      alt="avatar"
+                      className={`w-full rounded-md h-[20rem] mt-8 mb-2 ${!imageLoaded[index] ? "hidden" : ""}`}
+                      onLoad={() => {
+                        handleImageLoad(index);
+                      }}
+                    />
+
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      {product.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {product.description}
+                    </p>
+                    <div className="my-4 w-full text-right text-sky-600 font-semibold">
+                      ₹{product.price}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </Content>
         </Layout>
