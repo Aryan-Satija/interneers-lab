@@ -53,7 +53,10 @@ interface Product {
 
 const Product: React.FC = () => {
   const [mode, setMode] = useState<number>(0);
-  const [bookmark, setBookmark] = useLocalStorage<Product[]>("bookmarked", []);
+  const [bookmark, setBookmark] = useLocalStorage<Product[]>(
+    "bookmark/product",
+    [],
+  );
   return (
     <div className="w-screen h-screen">
       <Layout style={layoutStyle}>
