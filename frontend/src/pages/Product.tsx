@@ -1,11 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Layout } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
 import Sidebar from "components/Sidebar";
-import data from "../data.json";
+// import data from "../data.json";
 import Productlist from "components/Productlist";
 import CreateProduct from "components/createProduct";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { apiConnector } from "services/apiConnector";
+import { PRODUCTS } from "services/apis";
+import { toast } from "react-toastify";
 
 const { Header, Sider, Content } = Layout;
 
@@ -57,6 +60,21 @@ const Product: React.FC = () => {
     "bookmark/product",
     [],
   );
+  const [data, setData] = useState<Product[]>([]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await apiConnector({ method: "GET", url: PRODUCTS });
+        if (!res || !res.data || !res.data.products) {
+          throw new Error("Something went wrong");
+        }
+        setData(res.data.products);
+      } catch (err) {
+        console.log(err);
+        toast.error("Unable to load products. Please try again later.");
+      }
+    })();
+  }, []);
   return (
     <div className="w-screen h-screen">
       <Layout style={layoutStyle}>

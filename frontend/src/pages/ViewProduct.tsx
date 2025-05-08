@@ -3,6 +3,9 @@ import { Layout, Skeleton, Button, Input } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
 import { useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { apiConnector } from "services/apiConnector";
+import { PRODUCTS } from "services/apis";
+import { toast } from "react-toastify";
 
 const { Header, Sider, Content } = Layout;
 
@@ -60,31 +63,49 @@ const ViewProduct: React.FC = () => {
   };
 
   useEffect(() => {
-    //todo: make api call
     if (!id) return;
-    setTimeout(() => {
-      setProduct({
-        id: id,
-        name: "Laptop Pro",
-        price: 1299,
-        quantity: 20,
-        description:
-          "A professional-grade laptop featuring top-tier specifications, ideal for software developers, designers, and content creators.",
-        category: "Laptops",
-        brand: "Dell",
-      });
-      setUpdatedProduct({
-        id: id,
-        name: "Laptop Pro",
-        price: 1299,
-        quantity: 20,
-        description:
-          "A professional-grade laptop featuring top-tier specifications, ideal for software developers, designers, and content creators.",
-        category: "Laptops",
-        brand: "Dell",
-      });
-    }, 1000);
+    (async () => {
+      try {
+        const res = await apiConnector({
+          method: "GET",
+          url: PRODUCTS + id + "/",
+        });
+        if (!res || !res.data || !res.data.product) {
+          throw new Error("Something went wrong");
+        }
+        setProduct(res.data.product);
+        setUpdatedProduct(res.data.product);
+      } catch (err) {
+        console.log(err);
+        toast.error("Something went wrong! Please try again later!");
+      }
+    })();
   }, [id]);
+
+  const updateProduct = async () => {
+    const toastId = toast.loading("Please Wait...");
+    try {
+      const res = await apiConnector({
+        method: "PUT",
+        url: PRODUCTS + id + "/",
+        bodyData: updatedProduct,
+      });
+      console.log(res);
+      toast.update(toastId, {
+        render: "Product Updated Successfully",
+        type: "success",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    } catch (err) {
+      toast.update(toastId, {
+        render: "Something went wrong! Could not update!",
+        type: "error",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    }
+  };
 
   return (
     <div className="w-screen h-screen">
@@ -213,7 +234,11 @@ const ViewProduct: React.FC = () => {
                           </p>
                         </div>
                         <div>
-                          <Button type="default" className="mt-4">
+                          <Button
+                            type="default"
+                            className="mt-4"
+                            onClick={updateProduct}
+                          >
                             Update
                           </Button>
                         </div>
