@@ -14,3 +14,6 @@ class BrandService:
         else:
             raise BrandValidationError("Category data is invalid")   
 
+    def get_brands(self):
+        brands = brand_repository.get_all_brands()
+        return BrandSerializer(brands, many=True).data

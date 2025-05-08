@@ -132,6 +132,8 @@ class CategoryRepository:
         except ValidationError:
             raise CategoryValidationError("Invalid category ID")
 
+    def get_all_categories(self):
+        return Category.objects.all()
         
 class BrandRepository:
     
@@ -149,3 +151,6 @@ class BrandRepository:
             raise BrandNotFound(brand_id)
         except ValidationError:
             raise BrandValidationError("Invalid brand ID")
+        
+    def get_all_brands(self):
+        return Brand.objects.all()
