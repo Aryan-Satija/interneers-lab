@@ -5,6 +5,7 @@ import Sidebar from "components/Sidebar";
 import data from "../data.json";
 import Productlist from "components/Productlist";
 import CreateProduct from "components/createProduct";
+import { useLocalStorage } from "@uidotdev/usehooks";
 
 const { Header, Sider, Content } = Layout;
 
@@ -52,7 +53,7 @@ interface Product {
 
 const Product: React.FC = () => {
   const [mode, setMode] = useState<number>(0);
-  const [bookmark, setBookmark] = useState<Product[]>([]);
+  const [bookmark, setBookmark] = useLocalStorage<Product[]>("bookmarked", []);
   return (
     <div className="w-screen h-screen">
       <Layout style={layoutStyle}>

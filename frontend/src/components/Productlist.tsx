@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bookmark, Eye, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
@@ -26,19 +26,6 @@ const Productlist: React.FC<productListInterface> = ({
   setBookmark,
 }) => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (bookmark.length >= 0)
-      localStorage.setItem("bookmarked", JSON.stringify(bookmark));
-  }, [bookmark]);
-
-  useEffect(() => {
-    if (localStorage.getItem("bookmarked") !== null) {
-      setBookmark((prev) =>
-        JSON.parse(localStorage.getItem("bookmarked") || "[]"),
-      );
-    }
-  }, []);
 
   const toggleBookmark = (product: Product) => {
     console.log(product);
