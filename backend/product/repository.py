@@ -32,7 +32,7 @@ class ProductRepository:
             category_ids = [cat.id for cat in category_objs] 
             query &= Q(category__in=category_ids)  
             
-        return Products.objects.filter(query).order_by(sort_by)[start:end]
+        return Products.objects.filter(query).order_by(sort_by)[start:end], Products.objects.count()
     
     def get_product_by_id(self, product_id):
         if product_id is None:

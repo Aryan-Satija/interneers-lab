@@ -38,11 +38,12 @@ def product_list_create(request):
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
         try:
-            products = product_service.get_paginated_products(page, page_size, get_product_request, sort_by)
+            products, count = product_service.get_paginated_products(page, page_size, get_product_request, sort_by)
             return Response({
                 'page': page,
                 'page_size': page_size,
-                'products': products
+                'products': products,
+                'total_products': count
             }) 
         except ValueError as e:
             return Response({"error": str(e)}, status=400)

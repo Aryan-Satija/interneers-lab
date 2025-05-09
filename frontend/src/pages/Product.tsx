@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Layout } from "antd";
+import { Button, Layout } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
 import Sidebar from "components/Sidebar";
 // import data from "../data.json";
@@ -61,20 +61,26 @@ const Product: React.FC = () => {
     [],
   );
   const [data, setData] = useState<Product[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiConnector({ method: "GET", url: PRODUCTS });
+        const res = await apiConnector({
+          method: "GET",
+          url: PRODUCTS + `?page=${page}`,
+        });
         if (!res || !res.data || !res.data.products) {
           throw new Error("Something went wrong");
         }
         setData(res.data.products);
+        setTotalPages(Math.floor((res.data.total_products + 9) / 10));
       } catch (err) {
         console.log(err);
         toast.error("Unable to load products. Please try again later.");
       }
     })();
-  }, []);
+  }, [page]);
   return (
     <div className="w-screen h-screen">
       <Layout style={layoutStyle}>
@@ -87,11 +93,36 @@ const Product: React.FC = () => {
           </Header>
           <Content style={contentStyle}>
             {mode === 0 && (
-              <Productlist
-                data={data}
-                bookmark={bookmark}
-                setBookmark={setBookmark}
-              />
+              <>
+                <div className="w-full flex flex-row items-center justify-center gap-[2rem]">
+                  <Button
+                    type="default"
+                    onClick={() => {
+                      setPage(page - 1);
+                    }}
+                    disabled={page === 1}
+                  >
+                    PREV
+                  </Button>
+                  <p>
+                    showing {page} of {totalPages} pages
+                  </p>
+                  <Button
+                    type="default"
+                    disabled={page === totalPages}
+                    onClick={() => {
+                      setPage(page + 1);
+                    }}
+                  >
+                    NEXT
+                  </Button>
+                </div>
+                <Productlist
+                  data={data}
+                  bookmark={bookmark}
+                  setBookmark={setBookmark}
+                />
+              </>
             )}
             {mode === 1 && <CreateProduct />}
             {mode === 2 && (
