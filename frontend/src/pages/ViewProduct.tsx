@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Skeleton, Button, Input } from "antd";
+import { Layout, Skeleton, Button, Input, Select } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
 import { useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { apiConnector } from "services/apiConnector";
-import { PRODUCTS } from "services/apis";
+import { PRODUCTS, CATEGORIES, BRANDS } from "services/apis";
 import { toast } from "react-toastify";
 
 const { Header, Sider, Content } = Layout;
@@ -51,11 +51,27 @@ interface Product {
   brand: string;
 }
 
+interface updateProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  category: string | null;
+  brand: string | null;
+}
+
 const ViewProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
-  const [updatedProduct, setUpdatedProduct] = useState<Product | null>(null);
+  const [updatedProduct, setUpdatedProduct] = useState<updateProduct | null>(
+    null,
+  );
+  const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get("edit") === "true";
   const handleImageLoad = () => {
@@ -64,6 +80,8 @@ const ViewProduct: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+
+    // Fetching Product details
     (async () => {
       try {
         const res = await apiConnector({
@@ -74,23 +92,63 @@ const ViewProduct: React.FC = () => {
           throw new Error("Something went wrong");
         }
         setProduct(res.data.product);
-        setUpdatedProduct(res.data.product);
+        setUpdatedProduct({
+          id: res.data.product.id,
+          name: res.data.product.name,
+          description: res.data.product.description,
+          quantity: res.data.product.quantity,
+          price: res.data.product.price,
+          brand: null,
+          category: null,
+        });
       } catch (err) {
         console.log(err);
         toast.error("Something went wrong! Please try again later!");
       }
     })();
+
+    // Fetching all categories and brands
+    (async () => {
+      try {
+        const brandsRes = await apiConnector({
+          method: "GET",
+          url: BRANDS,
+        });
+        const categoriesRes = await apiConnector({
+          method: "GET",
+          url: CATEGORIES,
+        });
+        setBrands(brandsRes.data.brands);
+        setCategories(categoriesRes.data.categories);
+      } catch (err) {
+        toast.error(
+          "Something went wrong while fetching brands and categories!",
+        );
+      }
+    })();
   }, [id]);
 
   const updateProduct = async () => {
+    if (!updatedProduct) return;
+
+    if (!updatedProduct.brand) {
+      toast.error("Please choose a brand");
+      return;
+    }
+
+    if (!updatedProduct.category) {
+      toast.error("Please choose a category");
+      return;
+    }
+
     const toastId = toast.loading("Please Wait...");
     try {
-      const res = await apiConnector({
+      await apiConnector({
         method: "PUT",
         url: PRODUCTS + id + "/",
         bodyData: updatedProduct,
       });
-      console.log(res);
+
       toast.update(toastId, {
         render: "Product Updated Successfully",
         type: "success",
@@ -98,6 +156,7 @@ const ViewProduct: React.FC = () => {
         isLoading: false,
       });
     } catch (err) {
+      console.log(err);
       toast.update(toastId, {
         render: "Something went wrong! Could not update!",
         type: "error",
@@ -208,28 +267,35 @@ const ViewProduct: React.FC = () => {
                           </p>
                           <p>
                             Category:{" "}
-                            <Input
-                              value={updatedProduct?.category}
-                              onChange={(e) =>
+                            <Select
+                              className="w-full"
+                              value={updatedProduct?.category || undefined}
+                              onChange={(value) =>
                                 setUpdatedProduct((prev) =>
-                                  prev
-                                    ? { ...prev, category: e.target.value }
-                                    : prev,
+                                  prev ? { ...prev, category: value } : prev,
                                 )
                               }
+                              options={categories.map((cat) => ({
+                                label: cat.name,
+                                value: cat.id,
+                              }))}
                             />
                           </p>
+
                           <p>
                             Brand:{" "}
-                            <Input
-                              value={updatedProduct?.brand}
-                              onChange={(e) =>
+                            <Select
+                              className="w-full"
+                              value={updatedProduct?.brand || undefined}
+                              onChange={(value) =>
                                 setUpdatedProduct((prev) =>
-                                  prev
-                                    ? { ...prev, brand: e.target.value }
-                                    : prev,
+                                  prev ? { ...prev, brand: value } : prev,
                                 )
                               }
+                              options={brands.map((brand) => ({
+                                label: brand.name,
+                                value: brand.id,
+                              }))}
                             />
                           </p>
                         </div>
