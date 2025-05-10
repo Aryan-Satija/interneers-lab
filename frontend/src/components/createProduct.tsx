@@ -1,28 +1,64 @@
-import React, { useState } from "react";
-import { Input, Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Button, Select } from "antd";
 import { motion } from "framer-motion";
 import { toast } from "react-toastify";
+import { apiConnector } from "services/apiConnector";
+import { PRODUCTS, BRANDS, CATEGORIES } from "services/apis";
+
+interface Product {
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  category: string;
+  brand: string;
+}
 
 const CreateProduct: React.FC = () => {
-  const [product, setProduct] = useState({
+  const [product, setProduct] = useState<Product>({
     name: "",
     description: "",
-    price: "",
-    quantity: "",
+    price: 0,
+    quantity: 0,
     category: "",
     brand: "",
   });
-
+  const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (field: string, value: string) => {
+  const handleChange = (field: string, value: string | number) => {
     setProduct((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    // Fetching all categories and brands
+    (async () => {
+      try {
+        const brandsRes = await apiConnector({
+          method: "GET",
+          url: BRANDS,
+        });
+        const categoriesRes = await apiConnector({
+          method: "GET",
+          url: CATEGORIES,
+        });
+        setBrands(brandsRes.data.brands);
+        setCategories(categoriesRes.data.categories);
+      } catch (err) {
+        toast.error(
+          "Something went wrong while fetching brands and categories!",
+        );
+      }
+    })();
+  }, []);
+
+  const handleSubmit = async () => {
     if (
       !product.name ||
       !product.description ||
@@ -36,11 +72,11 @@ const CreateProduct: React.FC = () => {
     }
 
     setLoading(true);
-    const id = toast.loading("Saving...");
+    const id = toast.loading("Please wait...");
 
-    //todo: call create product api
-
-    setTimeout(() => {
+    try {
+      console.log(product);
+      await apiConnector({ method: "POST", url: PRODUCTS, bodyData: product });
       toast.update(id, {
         render: "Saved!",
         type: "success",
@@ -48,17 +84,16 @@ const CreateProduct: React.FC = () => {
         autoClose: 2000,
       });
       setLoading(false);
-      console.log("Product created:", product);
-
-      setProduct({
-        name: "",
-        description: "",
-        price: "",
-        quantity: "",
-        category: "",
-        brand: "",
+    } catch (err) {
+      console.log(err);
+      toast.update(id, {
+        render: "Something went wrong! Please try again later!",
+        type: "error",
+        isLoading: false,
+        autoClose: 5000,
       });
-    }, 2000);
+      setLoading(false);
+    }
   };
 
   return (
@@ -85,24 +120,43 @@ const CreateProduct: React.FC = () => {
           placeholder="Price"
           type="number"
           value={product.price}
-          onChange={(e) => handleChange("price", e.target.value)}
+          onChange={(e) => handleChange("price", Number(e.target.value))}
         />
         <Input
           placeholder="Quantity"
           type="number"
           value={product.quantity}
-          onChange={(e) => handleChange("quantity", e.target.value)}
+          onChange={(e) => handleChange("quantity", Number(e.target.value))}
         />
-        <Input
-          placeholder="Category"
-          value={product.category}
-          onChange={(e) => handleChange("category", e.target.value)}
-        />
-        <Input
-          placeholder="Brand"
-          value={product.brand}
-          onChange={(e) => handleChange("brand", e.target.value)}
-        />
+        <p>
+          Category:{" "}
+          <Select
+            className="w-full"
+            value={product?.category || undefined}
+            onChange={(value) =>
+              setProduct((prev) => (prev ? { ...prev, category: value } : prev))
+            }
+            options={categories.map((cat) => ({
+              label: cat.name,
+              value: cat.id,
+            }))}
+          />
+        </p>
+
+        <p>
+          Brand:{" "}
+          <Select
+            className="w-full"
+            value={product?.brand || undefined}
+            onChange={(value) =>
+              setProduct((prev) => (prev ? { ...prev, brand: value } : prev))
+            }
+            options={brands.map((brand) => ({
+              label: brand.name,
+              value: brand.id,
+            }))}
+          />
+        </p>
         <Button
           type="default"
           onClick={handleSubmit}

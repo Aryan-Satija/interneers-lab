@@ -12,3 +12,7 @@ class CategoryService:
             category_repository.create_category(serializer.data)
         else:
             raise CategoryValidationError("Category data is invalid")
+        
+    def get_categories(self):
+        categories = category_repository.get_all_categories()
+        return CategorySerializer(categories, many=True).data

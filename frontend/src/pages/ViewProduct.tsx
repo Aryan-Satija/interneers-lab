@@ -1,8 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Layout, Skeleton, Button, Input } from "antd";
+import { Layout, Skeleton } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
 import { useParams, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { apiConnector } from "services/apiConnector";
+import { PRODUCTS, CATEGORIES, BRANDS } from "services/apis";
+import { toast } from "react-toastify";
+import ProductDetails from "components/ProductDetails";
+import ProductEditor from "components/ProductEditor";
+import ProductImage from "components/ProductImage";
 
 const { Header, Sider, Content } = Layout;
 
@@ -48,11 +54,27 @@ interface Product {
   brand: string;
 }
 
+interface updateProduct {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  category: string | null;
+  brand: string | null;
+}
+
 const ViewProduct: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [product, setProduct] = useState<Product | null>(null);
-  const [updatedProduct, setUpdatedProduct] = useState<Product | null>(null);
+  const [updatedProduct, setUpdatedProduct] = useState<updateProduct | null>(
+    null,
+  );
+  const [brands, setBrands] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
   const [searchParams] = useSearchParams();
   const isEdit = searchParams.get("edit") === "true";
   const handleImageLoad = () => {
@@ -60,31 +82,92 @@ const ViewProduct: React.FC = () => {
   };
 
   useEffect(() => {
-    //todo: make api call
     if (!id) return;
-    setTimeout(() => {
-      setProduct({
-        id: id,
-        name: "Laptop Pro",
-        price: 1299,
-        quantity: 20,
-        description:
-          "A professional-grade laptop featuring top-tier specifications, ideal for software developers, designers, and content creators.",
-        category: "Laptops",
-        brand: "Dell",
-      });
-      setUpdatedProduct({
-        id: id,
-        name: "Laptop Pro",
-        price: 1299,
-        quantity: 20,
-        description:
-          "A professional-grade laptop featuring top-tier specifications, ideal for software developers, designers, and content creators.",
-        category: "Laptops",
-        brand: "Dell",
-      });
-    }, 1000);
+
+    // Fetching Product details
+    (async () => {
+      try {
+        const res = await apiConnector({
+          method: "GET",
+          url: PRODUCTS + id + "/",
+        });
+        if (!res || !res.data || !res.data.product) {
+          throw new Error("Something went wrong");
+        }
+        setProduct(res.data.product);
+        setUpdatedProduct({
+          id: res.data.product.id,
+          name: res.data.product.name,
+          description: res.data.product.description,
+          quantity: res.data.product.quantity,
+          price: res.data.product.price,
+          brand: null,
+          category: null,
+        });
+      } catch (err) {
+        console.log(err);
+        toast.error("Something went wrong! Please try again later!");
+      }
+    })();
+
+    // Fetching all categories and brands
+    (async () => {
+      try {
+        const brandsRes = await apiConnector({
+          method: "GET",
+          url: BRANDS,
+        });
+        const categoriesRes = await apiConnector({
+          method: "GET",
+          url: CATEGORIES,
+        });
+        setBrands(brandsRes.data.brands);
+        setCategories(categoriesRes.data.categories);
+      } catch (err) {
+        toast.error(
+          "Something went wrong while fetching brands and categories!",
+        );
+      }
+    })();
   }, [id]);
+
+  const updateProduct = async () => {
+    if (!updatedProduct) return;
+
+    if (!updatedProduct.brand) {
+      toast.error("Please choose a brand");
+      return;
+    }
+
+    if (!updatedProduct.category) {
+      toast.error("Please choose a category");
+      return;
+    }
+
+    const toastId = toast.loading("Please Wait...");
+    try {
+      await apiConnector({
+        method: "PUT",
+        url: PRODUCTS + id + "/",
+        bodyData: updatedProduct,
+      });
+
+      toast.update(toastId, {
+        render: "Product Updated Successfully",
+        type: "success",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    } catch (err) {
+      console.log(err);
+      toast.update(toastId, {
+        render: "Something went wrong! Could not update!",
+        type: "error",
+        autoClose: 5000,
+        isLoading: false,
+      });
+    }
+  };
 
   return (
     <div className="w-screen h-screen">
@@ -114,110 +197,19 @@ const ViewProduct: React.FC = () => {
               >
                 {isEdit && (
                   <>
-                    <div className="flex flex-col h-[440px] items-center justify-center w-full">
-                      {!imageLoaded && (
-                        <Skeleton.Image
-                          style={{ width: "100%", marginBottom: 16 }}
-                          active
-                        />
-                      )}
-                      <img
-                        src={`https://picsum.photos/600/400?random=${id}`}
-                        alt="Product"
-                        className={`rounded-lg w-full mb-4 ${!imageLoaded ? "hidden" : ""}`}
-                        onLoad={handleImageLoad}
-                      />
-                    </div>
+                    <ProductImage
+                      handleImageLoad={handleImageLoad}
+                      id={id}
+                      imageLoaded={imageLoaded}
+                    />
                     {product ? (
-                      <>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-2">
-                          <Input
-                            value={updatedProduct?.name}
-                            onChange={(e) =>
-                              setUpdatedProduct((prev) =>
-                                prev ? { ...prev, name: e.target.value } : prev,
-                              )
-                            }
-                          />
-                        </h2>
-                        <p className="text-gray-600 mb-4">
-                          <Input.TextArea
-                            rows={3}
-                            value={updatedProduct?.description}
-                            onChange={(e) =>
-                              setUpdatedProduct((prev) =>
-                                prev
-                                  ? { ...prev, description: e.target.value }
-                                  : prev,
-                              )
-                            }
-                          />
-                        </p>
-                        <div className="text-sm text-gray-500 flex flex-col gap-2">
-                          <p>
-                            Price: ₹{" "}
-                            <Input
-                              type="number"
-                              value={updatedProduct?.price}
-                              onChange={(e) =>
-                                setUpdatedProduct((prev) =>
-                                  prev
-                                    ? { ...prev, price: Number(e.target.value) }
-                                    : prev,
-                                )
-                              }
-                            />
-                          </p>
-                          <p>
-                            Quantity:{" "}
-                            <Input
-                              type="number"
-                              value={updatedProduct?.quantity}
-                              onChange={(e) =>
-                                setUpdatedProduct((prev) =>
-                                  prev
-                                    ? {
-                                        ...prev,
-                                        quantity: Number(e.target.value),
-                                      }
-                                    : prev,
-                                )
-                              }
-                            />
-                          </p>
-                          <p>
-                            Category:{" "}
-                            <Input
-                              value={updatedProduct?.category}
-                              onChange={(e) =>
-                                setUpdatedProduct((prev) =>
-                                  prev
-                                    ? { ...prev, category: e.target.value }
-                                    : prev,
-                                )
-                              }
-                            />
-                          </p>
-                          <p>
-                            Brand:{" "}
-                            <Input
-                              value={updatedProduct?.brand}
-                              onChange={(e) =>
-                                setUpdatedProduct((prev) =>
-                                  prev
-                                    ? { ...prev, brand: e.target.value }
-                                    : prev,
-                                )
-                              }
-                            />
-                          </p>
-                        </div>
-                        <div>
-                          <Button type="default" className="mt-4">
-                            Update
-                          </Button>
-                        </div>
-                      </>
+                      <ProductEditor
+                        updateProduct={updateProduct}
+                        brands={brands}
+                        categories={categories}
+                        setUpdatedProduct={setUpdatedProduct}
+                        updatedProduct={updatedProduct}
+                      />
                     ) : (
                       <Skeleton active />
                     )}
@@ -225,45 +217,13 @@ const ViewProduct: React.FC = () => {
                 )}
                 {!isEdit && (
                   <>
-                    <div className="flex flex-col h-[440px] items-center justify-center w-full">
-                      {!imageLoaded && (
-                        <Skeleton.Image
-                          style={{ width: "100%", marginBottom: 16 }}
-                          active
-                        />
-                      )}
-                      <img
-                        src={`https://picsum.photos/600/400?random=${id}`}
-                        alt="Product"
-                        className={`rounded-lg w-full mb-4 ${!imageLoaded ? "hidden" : ""}`}
-                        onLoad={handleImageLoad}
-                      />
-                    </div>
+                    <ProductImage
+                      handleImageLoad={handleImageLoad}
+                      id={id}
+                      imageLoaded={imageLoaded}
+                    />
                     {product ? (
-                      <>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                          {product.name}
-                        </h2>
-                        <p className="text-gray-600 mb-4">
-                          {product.description}
-                        </p>
-                        <div className="text-sm text-gray-500 flex flex-col gap-2">
-                          <p>Price: ₹{product.price}</p>
-                          <p>Quantity: {product.quantity}</p>
-                          <p>
-                            Category:{" "}
-                            <span className="text-sky-800 bg-sky-400/40 px-2 rounded-full">
-                              {product.category}
-                            </span>
-                          </p>
-                          <p>
-                            Brand:{" "}
-                            <span className="text-green-800 bg-green-400/40 px-2 rounded-full">
-                              {product.brand}
-                            </span>
-                          </p>
-                        </div>
-                      </>
+                      <ProductDetails product={product} />
                     ) : (
                       <Skeleton active />
                     )}

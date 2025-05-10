@@ -38,11 +38,12 @@ def product_list_create(request):
             return Response({"error": "Invalid page or page_size value"}, status=400)
 
         try:
-            products = product_service.get_paginated_products(page, page_size, get_product_request, sort_by)
+            products, count = product_service.get_paginated_products(page, page_size, get_product_request, sort_by)
             return Response({
                 'page': page,
                 'page_size': page_size,
-                'products': products
+                'products': products,
+                'total_products': count
             }) 
         except ValueError as e:
             return Response({"error": str(e)}, status=400)
@@ -91,22 +92,36 @@ def product_detail(request, product_id):
         return Response({"message": "Product Deleted Successfully"}, status=204) 
 
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 def add_brand(request):
-    try:
-        data = brand_service.create_brand(request.data)
-        return Response(data, status=201)
-    except BrandValidationError as e:
-        return Response({"error": str(e)}, status=400)
-    except Exception as e:
-        return Response({"error": "Something went wrong"}, status=500)   
+    if request.method == 'GET':
+        try:
+            data = brand_service.get_brands()
+            return Response({"brands": data}, status=200)
+        except Exception as e:
+            return Response({"error": "Something went wrong"}, status=500)
+    else:        
+        try:
+            data = brand_service.create_brand(request.data)
+            return Response({data}, status=201)
+        except BrandValidationError as e:
+            return Response({"error": str(e)}, status=400)
+        except Exception as e:
+            return Response({"error": "Something went wrong"}, status=500)   
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 def add_category(request):
-    try:
-        data = category_service.create_category(request.data)
-        return Response(data, status=201)
-    except CategoryValidationError as e:
-        return Response({"error": str(e)}, status=400)
-    except Exception as e:
-        return Response({"error": "Something went wrong"}, status=500)
+    if request.method == "GET":
+        try:
+            data = category_service.get_categories()
+            return Response({"categories": data}, status=200)
+        except Exception as e:
+            return Response({"error": "Something went wrong"}, status=500)
+    else:            
+        try:
+            data = category_service.create_category(request.data)
+            return Response(data, status=201)
+        except CategoryValidationError as e:
+            return Response({"error": str(e)}, status=400)
+        except Exception as e:
+            return Response({"error": "Something went wrong"}, status=500)

@@ -13,8 +13,8 @@ class ProductService:
         
         start = (page - 1) * page_size
         end = start + page_size
-        products = self.product_repository.get_all_products(start, end, get_product_request, sort_by)
-        return ProductsSerializer(products, many=True).data
+        products, count = self.product_repository.get_all_products(start, end, get_product_request, sort_by)
+        return ProductsSerializer(products, many=True).data, count
     
     def get_product_by_id(self, product_id):
         if product_id is None:
