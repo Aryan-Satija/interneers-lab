@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Bookmark, Eye, Pencil } from "lucide-react";
 import { motion } from "framer-motion";
 import { Skeleton } from "antd";
-
 interface Product {
   id: string;
   name: string;

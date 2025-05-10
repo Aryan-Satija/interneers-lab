@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Layout } from "antd";
+import { Layout } from "antd";
 import Breadcrumbs from "components/Breadcrumbs";
 import Sidebar from "components/Sidebar";
 // import data from "../data.json";
@@ -9,6 +9,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { apiConnector } from "services/apiConnector";
 import { PRODUCTS } from "services/apis";
 import { toast } from "react-toastify";
+import PaginationControl from "components/PaginationControl";
 
 const { Header, Sider, Content } = Layout;
 
@@ -54,6 +55,8 @@ interface Product {
   brand: string;
 }
 
+const pageSize = 10;
+
 const Product: React.FC = () => {
   const [mode, setMode] = useState<number>(0);
   const [bookmark, setBookmark] = useLocalStorage<Product[]>(
@@ -64,6 +67,7 @@ const Product: React.FC = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   useEffect(() => {
+    setData([]);
     (async () => {
       try {
         const res = await apiConnector({
@@ -74,7 +78,7 @@ const Product: React.FC = () => {
           throw new Error("Something went wrong");
         }
         setData(res.data.products);
-        setTotalPages(Math.floor((res.data.total_products + 9) / 10));
+        setTotalPages(Math.ceil(res.data.total_products / pageSize));
       } catch (err) {
         console.log(err);
         toast.error("Unable to load products. Please try again later.");
@@ -94,29 +98,11 @@ const Product: React.FC = () => {
           <Content style={contentStyle}>
             {mode === 0 && (
               <>
-                <div className="w-full flex flex-row items-center justify-center gap-[2rem]">
-                  <Button
-                    type="default"
-                    onClick={() => {
-                      setPage(page - 1);
-                    }}
-                    disabled={page === 1}
-                  >
-                    PREV
-                  </Button>
-                  <p>
-                    showing {page} of {totalPages} pages
-                  </p>
-                  <Button
-                    type="default"
-                    disabled={page === totalPages}
-                    onClick={() => {
-                      setPage(page + 1);
-                    }}
-                  >
-                    NEXT
-                  </Button>
-                </div>
+                <PaginationControl
+                  page={page}
+                  setPage={setPage}
+                  totalPages={totalPages}
+                />
                 <Productlist
                   data={data}
                   bookmark={bookmark}
